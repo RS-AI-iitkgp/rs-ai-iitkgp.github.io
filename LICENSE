@@ -1,0 +1,71 @@
+This repository contains two kinds of material, licensed separately.
+
+  Part A  Source code ............ MIT License
+  Part B  Data and images ........ All rights reserved (no licence granted)
+
+If a file is not clearly covered by Part A, Part B applies.
+
+
+==============================================================================
+PART A — SOURCE CODE (MIT License)
+==============================================================================
+
+Applies to:  index.html, alumni.html, and everything in assets/
+             (page structure, CSS and JavaScript only; the personal data
+             those pages display is covered by Part B)
+
+Copyright (c) 2026 Ranjan Sarkar
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+==============================================================================
+PART B — DATA AND IMAGES (All rights reserved)
+==============================================================================
+
+Applies to:  everything in data/ and images/, and any names, email addresses,
+             research interests, supervisor details, joining dates, profile
+             links, photographs or other personal information appearing
+             anywhere in this repository or on the published website.
+
+Copyright (c) 2026 Department of Artificial Intelligence, Indian Institute of
+Technology Kharagpur, and the individuals listed. All rights reserved.
+
+No licence is granted for this material. Without prior written permission from
+the Department of Artificial Intelligence, IIT Kharagpur, you may not copy,
+scrape, harvest, download in bulk, redistribute, republish, sell, or otherwise
+use it, in whole or in part, for any purpose. This includes, without
+limitation:
+
+  - building other directories, contact lists, mailing lists or databases;
+  - sending unsolicited email or other communication;
+  - compiling datasets, or training or evaluating machine-learning models.
+
+Viewing the published website in a web browser for personal, non-commercial
+reference is permitted.
+
+The name "Indian Institute of Technology Kharagpur" and the IIT Kharagpur
+emblem (images/logo/) are the property of IIT Kharagpur. They are used here
+only to identify the department and are not licensed for any other use.
+
+If you reuse the code under Part A, you must remove all Part B material and
+supply your own data and images.
+
+Requests for permission or removal of an entry: contact the Department of
+Artificial Intelligence, IIT Kharagpur.
