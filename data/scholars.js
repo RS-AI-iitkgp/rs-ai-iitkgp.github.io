@@ -11,7 +11,9 @@
                 colour coding. Keep spelling identical across entries.
                 "" shows as "Not specified".
    topic        Research interests / thesis title
-   supervisors  One or more supervisors, e.g. ["Prof. A", "Prof. B"]
+   supervisors  One or more supervisor names WITHOUT a title, e.g.
+                ["Jiaul Hoque Paik"]. The page adds "Dr." and links the
+                name to the website listed in data/supervisors.js.
                 ([] hides the block)
    photo        Path to a square photo, e.g. "images/scholars/jane-doe.jpg".
                 If the file is missing, the card shows initials instead.
@@ -63,7 +65,7 @@ window.SCHOLARS = [
   { name: "Piyali Karmakar", joined: "YYYY", area: "NLP & Information Retrieval", topic: "NLP and Assistive Technology", supervisors: ["Prof. Supervisor Name"], photo: "images/scholars/piyali-karmakar.jpg", email: "piyali.pcse2020@kgpian.iitkgp.ac.in", website: "#", scholar: "#", linkedin: "#", github: "#" },
   { name: "Priyanka", joined: "Jul 2021", area: "Applied AI", topic: "Machine Learning for Remote Sensing", supervisors: ["Adway Mitra", "Manjira Sinha"], photo: "images/scholars/priyanka.jpg", email: "priyankag.1@kgpian.iitkgp.ac.in", website: "#", scholar: "#", linkedin: "#", github: "#" },
   { name: "Raj Krishan Ghosh", joined: "Jul 2020", area: "Vision & Medical Imaging", topic: "Computational ultrasonic imaging and deep learning", supervisors: ["Debdoot Sheet"], photo: "images/scholars/raj-krishan-ghosh.jpg", email: "rajkrishanghosh@kgpian.iitkgp.ac.in", website: "#", scholar: "#", linkedin: "https://www.linkedin.com/in/raj-krishan-ghosh-77571a1b9/", github: "#" },
-  { name: "Ranjan Sarkar", joined: "Jan 2025", area: "Reinforcement Learning & Control", topic: "Reinforcement Learning", supervisors: ["Prabhat Kumar Mishra"], photo: "images/scholars/ranjan-sarkar.jpg", email: "ranjan.sarkar.24@kgpian.iitkgp.ac.in", website: "#", scholar: "#", linkedin: "https://www.linkedin.com/in/ranjan-sarkar/", github: "#" },
+  { name: "Ranjan Sarkar", joined: "Jan 2025", area: "Reinforcement Learning & Control", topic: "Reinforcement Learning, Stochastic Estimation and Optimization", supervisors: ["Prabhat Kumar Mishra"], photo: "images/scholars/ranjan-sarkar.jpg", email: "ranjan.sarkar.24@kgpian.iitkgp.ac.in", website: "https://ranjan-sarkar.github.io/", scholar: "https://scholar.google.com/citations?user=opM7lgEAAAAJ", linkedin: "https://www.linkedin.com/in/ranjan-sarkar/", github: "https://github.com/ranjan-sarkar" },
   { name: "Rekha Regar", joined: "Jul 2021", area: "NLP & Information Retrieval", topic: "Natural Language Processing", supervisors: ["Plaban Kumar Bhowmick", "Manjira Sinha"], photo: "images/scholars/rekha-regar.jpg", email: "rekharegar208@kgpian.iitkgp.ac.in", website: "#", scholar: "#", linkedin: "#", github: "#" },
   { name: "Rohan Saha", joined: "Jul 2026", area: "Machine Learning", topic: "Deep Learning", supervisors: ["Jiaul Hoque Paik"], photo: "images/scholars/rohan-saha.jpg", email: "rohan.saha26@kgpian.iitkgp.ac.in", website: "https://www.rohansaha.in/", scholar: "https://scholar.google.com/citations?user=u_jTV1UAAAAJ", linkedin: "https://www.linkedin.com/in/rohansaha-in/", github: "https://github.com/rsrohansaha" },
   { name: "Rupali Chandrakant Patole", joined: "YYYY", area: "Trustworthy & Secure AI", topic: "Responsible AI, LLM", supervisors: ["Prof. Supervisor Name"], photo: "images/scholars/rupali-chandrakant-patole.jpg", email: "rupalipatole.24@kgpian.iitkgp.ac.in", website: "#", scholar: "#", linkedin: "#", github: "#" },

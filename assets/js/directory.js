@@ -125,8 +125,9 @@
     const qs = skel(q);
     if (qs.length >= 2 && qs === e.s) return 0.85;
     if (qs.length >= 4 && e.s.startsWith(qs)) return 0.78;
-    const max = q.length >= 9 ? 3 : q.length >= 6 ? 2 : q.length >= 4 ? 1 : 0;
-    if (!max) return 0;
+    // Typos rarely change the first letter, so allow one edit fewer when it differs ("sanjay" ≠ "ranjan").
+    const max = (q.length >= 9 ? 3 : q.length >= 6 ? 2 : q.length >= 4 ? 1 : 0) - (q[0] !== w[0] ? 1 : 0);
+    if (max <= 0) return 0;
     const d = osa(q, w, max);
     if (d <= max) return 0.8 - 0.12 * d;
     if (q.length >= 5 && w.length > q.length) { // half-typed word with a typo: "reinfro" → "reinforcement"
@@ -155,15 +156,26 @@
   const linkIcon = (href, id, label, name) =>
     href ? `<a href="${esc(href)}" ${href.startsWith("#") ? "" : 'target="_blank" rel="noopener"'} title="${label}" aria-label="${label} — ${esc(name)}">${icon(id)}</a>` : "";
 
+  // "Dr. Name", linked to the homepage in data/supervisors.js when known.
+  const SUP_SITES = window.SUPERVISORS || {};
+  function supervisorHTML(name) {
+    if (PLACEHOLDER.test(name)) return esc(name);
+    const label = /^(dr|prof)\.?\s/i.test(name) ? name : `Dr. ${name}`;
+    const url = safeUrl(SUP_SITES[name]);
+    return url && url !== "#"
+      ? `<a class="sup-link" href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}</a>`
+      : esc(label);
+  }
+
   function cardHTML(s) {
     const alumni = cfg.kind === "alumni";
     const sups = s.supervisors;
     const text = alumni ? s.thesis : s.topic;
     const links = [
       s.email ? linkIcon(`mailto:${s.email}`, "mail", "Email", s.name) : "",
+      linkIcon(safeUrl(s.linkedin), "linkedin", "LinkedIn", s.name),
       linkIcon(safeUrl(s.website), "globe", "Website", s.name),
       linkIcon(safeUrl(s.scholar), "scholar", "Google Scholar", s.name),
-      linkIcon(safeUrl(s.linkedin), "linkedin", "LinkedIn", s.name),
       linkIcon(safeUrl(s.github), "github", "GitHub", s.name),
     ].join("");
     const position = alumni && (s.position || s.organisation)
@@ -177,7 +189,7 @@
         ${position}
       </div>
       <p class="c-topic">${text ? `${alumni ? '<span class="c-label">Thesis</span>' : ""}${esc(text)}` : ""}</p>
-      ${sups.length ? `<div class="c-sup"><span class="c-label">${sups.length > 1 ? "Supervisors" : "Supervisor"}</span>${sups.map(esc).join(", ")}</div>` : ""}
+      ${sups.length ? `<div class="c-sup"><span class="c-label">${sups.length > 1 ? "Supervisors" : "Supervisor"}</span>${sups.map(supervisorHTML).join(", ")}</div>` : ""}
       <div class="c-links">${links}</div>`;
   }
 
