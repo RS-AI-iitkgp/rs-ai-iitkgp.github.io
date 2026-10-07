@@ -8,8 +8,6 @@
   const cfg = window.DIRECTORY;
   const $ = (sel, root = document) => root.querySelector(sel);
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const canTransition = typeof document.startViewTransition === "function" && !reduceMotion;
-  const withTransition = (fn) => (canTransition ? document.startViewTransition(fn) : fn());
 
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const safeUrl = (u) => (/^(https?:\/\/|#)/i.test(String(u || "").trim()) ? String(u).trim() : "");
@@ -261,7 +259,6 @@
     el.className = "card reveal" + (s.supervisors.length ? "" : " no-sup") + (cfg.kind === "event" ? " is-event" : "")
       + (s.highlights && s.highlights.length ? " has-media" : "");
     el.style.setProperty("--area", HUE.get(s.group));
-    el.style.viewTransitionName = `${cfg.kind}-${i}`;
     el.innerHTML = cardHTML(s);
     return { s, el, i, index: buildIndex(s), hit: null };
   });
@@ -567,9 +564,17 @@
     syncUrl();
   }
 
+  // Filtering, sorting and view changes: update at once, then fade the cards in (no per-card morphing).
+  function fadeIn() {
+    if (reduceMotion) return;
+    grid.classList.remove("swap");
+    void grid.offsetWidth; // restart the fade
+    grid.classList.add("swap");
+  }
   function apply(animate = true) {
     if (animate) settle();
-    animate ? withTransition(update) : update();
+    update();
+    if (animate) fadeIn();
   }
 
   function setState(patch, animate = true) {
@@ -633,8 +638,7 @@
     }
   });
 
-  // Grid ↔ list (toolbar buttons and the phone button): switch at once and fade the cards in,
-  // no per-card morphing, keeping the card you were looking at in place.
+  // Grid ↔ list (toolbar buttons and the phone button), keeping the card you were looking at in place.
   function switchView(view) {
     if (view === state.view) return;
     const top = $("#siteHeader").offsetHeight;
@@ -644,7 +648,7 @@
     settle();
     setState({ view }, false);
     if (anchor) window.scrollBy({ top: anchor.getBoundingClientRect().top - before, behavior: "instant" });
-    if (!reduceMotion) { grid.classList.remove("swap"); void grid.offsetWidth; grid.classList.add("swap"); }
+    fadeIn();
   }
   document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => switchView(b.dataset.view)));
 

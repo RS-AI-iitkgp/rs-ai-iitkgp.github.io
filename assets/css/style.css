@@ -519,7 +519,7 @@ kbd {
 .search-fab { display: none; }
 .view-fab { display: none; }
 @keyframes swap-in { from { opacity: 0; } }
-.grid.swap { animation: swap-in .25s ease-out; } /* grid ↔ list: a plain fade */
+.grid.swap { animation: swap-in .25s ease-out; } /* filtering, sorting, grid ↔ list: a plain fade */
 .sheet-backdrop {
   position: fixed; inset: 0; z-index: 55; background: rgba(12, 14, 18, .42);
   -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
@@ -533,19 +533,6 @@ html.sheet-open { overflow: hidden; }
   opacity: 0; transform: translateY(10px); pointer-events: none; transition: opacity .3s ease, transform .3s var(--ease);
 }
 .to-top.show { opacity: 1; transform: none; pointer-events: auto; }
-
-/* View transitions (filtering, sorting, layout switch) */
-::view-transition-group(*) { animation-duration: .45s; animation-timing-function: var(--ease); }
-::view-transition-old(root), ::view-transition-new(root) { animation-duration: .25s; }
-/* Keep fixed/sticky chrome above the animating cards, so it never disappears mid-transition. */
-.site-header { view-transition-name: site-header; }
-.toolbar { view-transition-name: toolbar; }
-.search-fab { view-transition-name: search-fab; }
-.view-fab { view-transition-name: view-fab; }
-.to-top { view-transition-name: to-top; }
-::view-transition-group(site-header), ::view-transition-group(toolbar),
-::view-transition-group(search-fab), ::view-transition-group(view-fab), ::view-transition-group(to-top) { z-index: 100; }
-::view-transition-group(site-header) { z-index: 101; }
 
 /* Theme switch: smooth colour fade (no page snapshot) */
 html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
