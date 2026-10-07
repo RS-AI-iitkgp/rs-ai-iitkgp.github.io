@@ -185,7 +185,8 @@
     const small = s.day ? `${MONTHS[s.month]} ${s.year}` : s.year && /[a-z]/i.test(s.yearLabel) ? s.year : "";
     const meta = [s.speaker && `<b>${esc(s.speaker)}</b>${s.affiliation ? `, ${esc(s.affiliation)}` : ""}`, s.venue && esc(s.venue)]
       .filter(Boolean).join(" · ");
-    const pills = s.links.map((l) => {
+    const detail = s.id ? `event.html?id=${encodeURIComponent(s.id)}` : "";
+    const pills = (detail ? `<a class="c-pill c-pill-main" href="${detail}">Photos &amp; details <span aria-hidden="true">→</span></a>` : "") + s.links.map((l) => {
       const href = safeUrl(l.url);
       return href ? `<a class="c-pill" href="${esc(href)}" ${href.startsWith("#") ? "" : 'target="_blank" rel="noopener"'}>${esc(l.label || "Link")} <span aria-hidden="true">↗</span></a>` : "";
     }).join("");
@@ -193,7 +194,7 @@
       <div class="c-photo c-date" aria-hidden="true"><span class="d-big">${esc(big)}</span>${small ? `<span class="d-small">${esc(small)}</span>` : ""}</div>
       <span class="c-joined c-tag">${esc(s.group)}</span>
       <div class="c-id">
-        <h3 class="c-name">${esc(s.title)}</h3>
+        <h3 class="c-name">${detail ? `<a class="c-title-link" href="${detail}">${esc(s.title)}</a>` : esc(s.title)}</h3>
         ${meta ? `<p class="c-pos">${icon(s.speaker ? "mic" : "pin", 15)}<span>${meta}</span></p>` : ""}
       </div>
       <p class="c-topic">${esc(s.summary || "")}</p>
