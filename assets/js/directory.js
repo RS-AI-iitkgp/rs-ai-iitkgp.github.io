@@ -687,11 +687,21 @@
   }
 
   /* ---------- Hero numbers ---------- */
+  function countUp(el, to) {
+    if (reduceMotion) { el.textContent = to; return; }
+    const start = performance.now(), dur = 1100;
+    const tick = (t) => {
+      const k = Math.min(1, (t - start) / dur);
+      el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3)));
+      if (k < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
   const stats = cfg.stats({ items: ITEMS, groups: GROUPS.filter((g) => g !== NONE), years: YEARS });
   document.querySelectorAll("[data-count]").forEach((el) => {
     const v = stats[el.dataset.count];
     if (v == null) el.closest("li").hidden = true;
-    else el.textContent = v; // shown as-is; the row fades in via CSS
+    else countUp(el, v);
   });
   const batchLabel = $("#batchLabel");
   if (batchLabel && YEARS.length > 1) batchLabel.textContent += ` · ${YEARS[YEARS.length - 1]}–${YEARS[0]}`;
