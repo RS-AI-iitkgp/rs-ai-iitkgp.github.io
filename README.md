@@ -1,6 +1,8 @@
 # PhD Scholars — Department of AI, IIT Kharagpur
 
 A static website listing the department's current PhD scholars and alumni.
+
+**Live site:** https://phdscholars-ai.github.io
 It has no build step and no dependencies: plain HTML, CSS and JavaScript.
 
 ## Pages
@@ -51,8 +53,9 @@ Then visit http://localhost:8000.
 
 ## Deploying
 
-Upload the whole folder to any static host (institute web server, GitHub Pages,
-Netlify, etc.). No server-side code is needed.
+The site is published with GitHub Pages from the `main` branch of
+`PhDscholars-AI/phdscholars-ai.github.io`. Any push to `main` goes live within
+a minute or two. It also works on any other static host (no server-side code).
 
 ## Licence
 
