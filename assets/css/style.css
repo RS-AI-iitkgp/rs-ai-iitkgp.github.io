@@ -362,7 +362,8 @@ kbd {
   border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
 }
 .grid.is-list .card {
-  grid-template-columns: 72px minmax(180px, 1.1fr) minmax(0, 1.5fr) minmax(150px, 1fr) max-content auto;
+  /* Fixed widths for badge/link columns keep every row's columns aligned. */
+  grid-template-columns: 72px minmax(180px, 1.1fr) minmax(0, 1.5fr) minmax(150px, 1fr) 124px 180px;
   grid-template-areas: "mono id topic sup joined links"; grid-template-rows: auto;
   align-items: center; column-gap: 22px; padding: 16px 20px; border: 0; border-radius: 0; box-shadow: none;
 }
@@ -452,7 +453,7 @@ html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
 /* ------------------------------------------------------------------ */
 @media (max-width: 1020px) {
   .grid.is-list .card {
-    grid-template-columns: 72px minmax(0, 1fr) minmax(0, 1fr) auto;
+    grid-template-columns: 72px minmax(0, 1fr) minmax(0, 1fr) 180px;
     grid-template-areas: "mono id sup joined" ". topic topic links";
     row-gap: 8px;
   }
@@ -520,7 +521,7 @@ html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
   .dd-panel { min-width: max(100%, 220px); }
   kbd { display: none; }
   .grid.is-list .card {
-    grid-template-columns: 60px minmax(0, 1fr) auto;
+    grid-template-columns: 60px minmax(0, 1fr) 124px;
     grid-template-areas: "mono id joined" ". sup sup";
     column-gap: 14px; padding: 14px 16px;
   }
@@ -551,12 +552,12 @@ html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
 
 /* Event rows in list view: date · title/venue · summary · category (no links) */
 .grid.is-list .card.is-event {
-  grid-template-columns: 72px minmax(200px, 1.1fr) minmax(0, 2fr) max-content;
+  grid-template-columns: 72px minmax(200px, 1.1fr) minmax(0, 2fr) 160px;
   grid-template-areas: "mono id topic joined";
 }
 .grid.is-list .card.is-event .c-links { display: none; }
 @media (max-width: 1020px) {
-  .grid.is-list .card.is-event { grid-template-columns: 72px minmax(0, 1fr) max-content; grid-template-areas: "mono id joined" ". topic topic"; }
+  .grid.is-list .card.is-event { grid-template-columns: 72px minmax(0, 1fr) 160px; grid-template-areas: "mono id joined" ". topic topic"; }
 }
 @media (max-width: 720px) {
   .grid.is-list .card.is-event { grid-template-columns: 60px minmax(0, 1fr); grid-template-areas: "mono id" "mono joined"; row-gap: 6px; }
