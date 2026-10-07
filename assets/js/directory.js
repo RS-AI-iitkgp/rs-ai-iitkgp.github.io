@@ -59,6 +59,7 @@
         // "MS" → "MS by Research"; any other text is shown as-is (e.g. "PhD · Working Professional"); default "PhD".
         const prog = String(s.program || "").trim();
         s.programLabel = /^ms\b/i.test(prog) ? "MS by Research" : prog || "PhD";
+        s.progKey = /working/i.test(prog) ? "Working Professional" : /^ms\b/i.test(prog) ? "MS by Research" : "PhD";
       }
     }
     return s;
@@ -72,7 +73,7 @@
 
   const SORTERS = { "year-desc": byYear(-1), "year-asc": byYear(1), "name-asc": byName, "name-desc": (a, b) => -byName(a, b) };
   const DEFAULT_SORT = SORTERS[cfg.defaultSort] ? cfg.defaultSort : YEARS.length ? "year-desc" : "name-asc";
-  const state = { q: "", group: "all", year: "all", sort: DEFAULT_SORT, view: "grid" };
+  const state = { q: "", group: "all", year: "all", prog: "all", sort: DEFAULT_SORT, view: "grid" };
 
   /* ---------- Smart search: typo-tolerant, abbreviation-aware, ranked ---------- */
   const STOP = new Set(["a", "an", "and", "at", "by", "for", "in", "of", "on", "the", "to", "with", "prof", "dr", "mr", "mrs"]);
@@ -471,6 +472,8 @@
   const groupSel = $("#group");
   const yearSel = $("#year");
   const sortSel = $("#sort");
+  const progSel = $("#prog");
+  const PROGS = progSel ? ["PhD", "MS by Research", "Working Professional"].filter((g) => ITEMS.some((s) => s.progKey === g)) : [];
 
   groupSel.innerHTML = [`<option value="all">${esc(cfg.group.all)}</option>`, ...GROUPS.map((g) => `<option value="${esc(g)}" data-hue="${HUE.get(g)}">${esc(g)}</option>`)].join("");
   const groupOpts = [...groupSel.options];
@@ -479,11 +482,19 @@
     YEARS.map((y) => `<option value="${y}">${esc(`${cfg.year.label} ${y}`.trim())}</option>`).join("");
   if (!YEARS.length) yearSel.closest(".select").hidden = true;
 
+  if (progSel) {
+    const PROG_LABEL = { PhD: "Regular PhD" }; // full-time PhD (working professionals have their own option)
+    progSel.innerHTML = `<option value="all">All programmes</option>` + PROGS.map((g) => `<option value="${esc(g)}">${esc(PROG_LABEL[g] || g)}</option>`).join("");
+    if (PROGS.length < 2) progSel.closest(".select").hidden = true;
+  }
+  const progOpts = progSel ? [...progSel.options] : [];
+
   sortSel.innerHTML = cfg.sorts.map(([v, label]) => `<option value="${v}">${esc(label)}</option>`).join("");
 
   const groupDD = Dropdown(groupSel, { showCount: true });
   const yearDD = Dropdown(yearSel);
   const sortDD = Dropdown(sortSel);
+  const progDD = progSel ? Dropdown(progSel, { showCount: true }) : null;
 
   /* ---------- Apply state ---------- */
   let searchMode = "all"; // "all" words must match; falls back to "any" when nothing matches all
@@ -497,12 +508,13 @@
     if (searching && !cards.some((c) => c.hit.all && passesFilters(c))) searchMode = "any";
   }
 
-  const passesFilters = (c, ignoreGroup = false) =>
-    (ignoreGroup || state.group === "all" || c.s.group === state.group)
-    && (state.year === "all" || String(c.s.year) === state.year);
+  const passesFilters = (c, ignore = "") =>
+    (ignore === "group" || state.group === "all" || c.s.group === state.group)
+    && (state.year === "all" || String(c.s.year) === state.year)
+    && (ignore === "prog" || state.prog === "all" || c.s.progKey === state.prog);
 
-  function matches(c, ignoreGroup = false) {
-    if (!passesFilters(c, ignoreGroup)) return false;
+  function matches(c, ignore = "") {
+    if (!passesFilters(c, ignore)) return false;
     if (!c.hit) return true;
     return searchMode === "all" ? c.hit.all : c.hit.n > 0;
   }
@@ -526,16 +538,21 @@
     grid.hidden = shown === 0;
     $("#empty").hidden = shown !== 0;
 
-    // Option counts reflect the current search and year.
+    // Option counts reflect the current search and the other filters.
     groupOpts.forEach((o) => {
       const g = o.value;
-      const n = cards.filter((c) => matches(c, true) && (g === "all" || c.s.group === g)).length;
-      o.dataset.count = n;
+      o.dataset.count = cards.filter((c) => matches(c, "group") && (g === "all" || c.s.group === g)).length;
+    });
+    progOpts.forEach((o) => {
+      const g = o.value;
+      o.dataset.count = cards.filter((c) => matches(c, "prog") && (g === "all" || c.s.progKey === g)).length;
     });
     groupSel.value = state.group;
     yearSel.value = state.year;
     sortSel.value = state.sort;
-    [groupDD, yearDD, sortDD].forEach((d) => d.sync());
+    if (progSel) progSel.value = state.prog;
+    [groupDD, yearDD, sortDD, progDD].forEach((d) => d && d.sync());
+    if (progSel) progSel.closest(".select").classList.toggle("is-active", state.prog !== "all");
     groupSel.closest(".select").classList.toggle("is-active", state.group !== "all");
     yearSel.closest(".select").classList.toggle("is-active", state.year !== "all");
     document.querySelectorAll(".seg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === state.view)));
@@ -548,7 +565,7 @@
     }
 
     const [one, many] = cfg.noun;
-    const filtered = state.q.trim() || state.group !== "all" || state.year !== "all";
+    const filtered = state.q.trim() || state.group !== "all" || state.year !== "all" || state.prog !== "all";
     $("#resultText").innerHTML = searching && searchMode === "any" && shown
       ? `No exact match — showing <b>${shown}</b> close ${shown === 1 ? "match" : "matches"}`
       : filtered
@@ -556,7 +573,7 @@
         : `<b>${cards.length}</b> ${cards.length === 1 ? one : many}`;
     $("#clearBtn").hidden = !filtered;
     $("#sheetCount").textContent = filtered ? `${shown} of ${cards.length}` : `${cards.length} ${many}`;
-    const active = [state.q.trim(), state.group !== "all", state.year !== "all"].filter(Boolean).length;
+    const active = [state.q.trim(), state.group !== "all", state.year !== "all", state.prog !== "all"].filter(Boolean).length;
     const badge = $("#fabBadge");
     badge.hidden = !active;
     badge.textContent = active;
@@ -590,6 +607,7 @@
     if (state.q.trim()) p.set("q", state.q.trim());
     if (state.group !== "all") p.set(P, state.group);
     if (state.year !== "all") p.set("year", state.year);
+    if (state.prog !== "all") p.set("programme", state.prog);
     if (state.sort !== DEFAULT_SORT) p.set("sort", state.sort);
     if (state.view !== "grid") p.set("view", state.view);
     const qs = p.toString();
@@ -607,6 +625,8 @@
     const group = p.get(P), year = p.get("year"), sort = p.get("sort"), view = p.get("view");
     if (group && GROUPS.includes(group)) state.group = group;
     if (year && YEARS.includes(Number(year))) state.year = year;
+    const prog = p.get("programme");
+    if (prog && PROGS.includes(prog)) state.prog = prog;
     if (sort && SORTERS[sort] && cfg.sorts.some(([v]) => v === sort)) state.sort = sort;
     // A new visit opens in grid view; a switch to list lasts for the rest of the visit
     // (refreshes and other pages) via sessionStorage, and ?view=list in shared links.
@@ -618,6 +638,7 @@
   /* ---------- Events ---------- */
   groupSel.addEventListener("change", () => setState({ group: groupSel.value }));
   yearSel.addEventListener("change", () => setState({ year: yearSel.value }));
+  if (progSel) progSel.addEventListener("change", () => setState({ prog: progSel.value }));
   sortSel.addEventListener("change", () => setState({ sort: sortSel.value }));
 
   let qTimer;
@@ -652,7 +673,7 @@
   }
   document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => switchView(b.dataset.view)));
 
-  const clearAll = () => setState({ q: "", group: "all", year: "all" });
+  const clearAll = () => setState({ q: "", group: "all", year: "all", prog: "all" });
   $("#clearBtn").addEventListener("click", clearAll);
   document.querySelector("[data-clear]").addEventListener("click", clearAll);
 
@@ -693,7 +714,7 @@
   function openSheet() {
     if (sheetOpen) return;
     sheetOpen = true;
-    sheetSnapshot = JSON.stringify([state.q, state.group, state.year, state.sort]);
+    sheetSnapshot = JSON.stringify([state.q, state.group, state.year, state.prog, state.sort]);
     spacer.style.height = `${toolbar.offsetHeight + parseFloat(getComputedStyle(toolbar).marginBottom)}px`; // no layout jump
     toolbar.classList.add("as-sheet");
     toolbar.setAttribute("role", "dialog");
@@ -712,7 +733,7 @@
     toolbar.classList.add("closing");
     backdrop.classList.remove("show");
     fab.setAttribute("aria-expanded", "false");
-    const changed = toResults || sheetSnapshot !== JSON.stringify([state.q, state.group, state.year, state.sort]);
+    const changed = toResults || sheetSnapshot !== JSON.stringify([state.q, state.group, state.year, state.prog, state.sort]);
     setTimeout(() => {
       toolbar.classList.remove("as-sheet", "closing");
       toolbar.removeAttribute("role");

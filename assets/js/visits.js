@@ -16,22 +16,25 @@
   // Don't count local previews.
   if (!CODE || location.protocol === "file:" || /^(localhost|127\.|\[::1\])/.test(location.hostname)) return;
 
-  // Each event page counts separately (event.html?id=…); search and filter settings in the URL are ignored.
+  // "/" and "/index.html" count as one page; each event page counts separately (event.html?id=…);
+  // search and filter settings in the URL are ignored.
   const id = new URLSearchParams(location.search).get("id");
-  window.goatcounter = { path: location.pathname + (/event\.html$/.test(location.pathname) && id ? `?id=${encodeURIComponent(id)}` : "") };
+  const page = location.pathname.replace(/\/index\.html$/, "/");
+  window.goatcounter = { path: page + (/event\.html$/.test(page) && id ? `?id=${encodeURIComponent(id)}` : "") };
   const s = document.createElement("script");
   s.async = true;
   s.src = "https://gc.zgo.at/count.js";
   s.dataset.goatcounter = `https://${CODE}.goatcounter.com/count`;
   document.head.appendChild(s);
 
-  // Total visits to the whole site, in the footer.
+  // Total visits to the whole site, in the footer. GoatCounter refreshes this public total
+  // at most every few hours (the dashboard is live), and it stays hidden while it's 0.
   const out = document.getElementById("visitCount");
   if (!out || !window.fetch) return;
   fetch(`https://${CODE}.goatcounter.com/counter/TOTAL.json`)
     .then((r) => (r.ok ? r.json() : null))
     .then((d) => {
-      if (!d || !d.count) return;
+      if (!d || !d.count || !/[1-9]/.test(d.count)) return;
       out.textContent = `${d.count} visits`;
       out.hidden = false;
     })

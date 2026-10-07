@@ -213,6 +213,12 @@ h1 span { color: var(--accent); }
   transition: box-shadow .3s ease, border-color .3s ease;
 }
 .toolbar.stuck { box-shadow: var(--shadow-md); border-color: var(--line-strong); }
+/* Scholars page (four dropdowns): on mid-size screens the search gets its own row */
+@media (min-width: 721px) and (max-width: 1120px) {
+  .toolbar:has(#prog) { flex-wrap: wrap; }
+  .toolbar:has(#prog) .search { flex: 1 1 100%; }
+  .toolbar:has(#prog) .select { flex: 1 1 0; }
+}
 .search {
   position: relative; flex: 1; display: flex; align-items: center; gap: 10px; min-width: 0;
   height: 40px; padding: 0 9px 0 13px; border: 1px solid transparent; border-radius: 9px; background: var(--bg);
