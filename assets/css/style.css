@@ -60,6 +60,7 @@ body {
   font: 400 15px/1.6 var(--sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: clip; /* safety net: no sideways scrolling */
 }
 a { color: inherit; }
 button, input, select { font: inherit; color: inherit; }
@@ -217,13 +218,17 @@ kbd {
   padding: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
   box-shadow: 0 28px 56px -20px rgba(22, 24, 29, .30), 0 6px 16px -6px rgba(22, 24, 29, .10);
   scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent;
-  opacity: 0; visibility: hidden; transform: translateY(-6px) scale(.97); transform-origin: top left;
-  transition: opacity .16s ease, transform .22s var(--ease), visibility 0s linear .22s;
+  /* Closed menus are removed from layout (display: none) so they can never widen the page. */
+  display: none; opacity: 0; transform: translateY(-6px) scale(.97); transform-origin: top left;
+  transition: opacity .16s ease, transform .22s var(--ease), display .22s allow-discrete;
 }
 .dd-panel.align-right { left: auto; right: 0; transform-origin: top right; }
 .dd-panel.drop-up { top: auto; bottom: calc(100% + 8px); transform-origin: bottom left; }
 .dd-panel.drop-up.align-right { transform-origin: bottom right; }
-.select.open .dd-panel { opacity: 1; visibility: visible; transform: none; transition: opacity .18s ease, transform .26s var(--ease), visibility 0s; }
+.select.open .dd-panel { display: block; opacity: 1; transform: none; transition: opacity .18s ease, transform .26s var(--ease), display 0s allow-discrete; }
+@starting-style {
+  .select.open .dd-panel { opacity: 0; transform: translateY(-6px) scale(.97); }
+}
 :root[data-theme="dark"] .dd-panel { box-shadow: 0 28px 56px -18px rgba(0, 0, 0, .75), 0 6px 16px -6px rgba(0, 0, 0, .4); }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .dd-panel { box-shadow: 0 28px 56px -18px rgba(0, 0, 0, .75), 0 6px 16px -6px rgba(0, 0, 0, .4); }
