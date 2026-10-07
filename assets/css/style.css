@@ -98,6 +98,44 @@ svg { display: block; flex-shrink: 0; }
 .brand-name { font-weight: 600; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .brand-name .short { display: none; }
 .brand-sub { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Event pages: once the page title scrolls away, it takes the brand text's place in the header
+   (position and width set by event.js; on narrow screens it also covers the nav while scrolling down). */
+.header-inner { position: relative; }
+.hdr-event {
+  position: absolute; top: 50%; left: var(--hdr-left, 56px); width: var(--hdr-width, 50%);
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0;
+  padding: 0; border: 0; background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer;
+  opacity: 0; visibility: hidden; transform: translateY(calc(-50% + 12px));
+  transition: opacity .25s ease, transform .4s var(--ease), visibility 0s linear .4s;
+}
+.hdr-event-meta {
+  display: inline-flex; align-items: center; gap: 6px; max-width: 100%;
+  font-size: 12px; line-height: 1.25; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.hdr-event-meta::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--area, var(--accent)); }
+.hdr-event-title {
+  max-width: 100%; font: 600 15px/1.25 var(--display); letter-spacing: -.005em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color .2s ease;
+}
+.hdr-event:hover .hdr-event-title { color: var(--area, var(--accent)); }
+.hdr-event:focus-visible { outline: 2px solid var(--area, var(--accent)); outline-offset: 4px; border-radius: 6px; }
+.brand-text, .nav { transition: opacity .2s ease, transform .35s var(--ease), visibility 0s linear 0s; }
+.site-header.show-event .hdr-event { opacity: 1; visibility: visible; transform: translateY(-50%); transition-delay: 0s; }
+.site-header.show-event .brand-text { opacity: 0; transform: translateY(-12px); }
+.site-header.show-event.hdr-compact .nav { opacity: 0; visibility: hidden; transform: translateY(-12px); transition-delay: 0s, 0s, .35s; }
+/* Reading progress along the header's bottom edge */
+.hdr-progress {
+  position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; pointer-events: none;
+  background: var(--area, var(--accent)); transform: scaleX(var(--p, 0)); transform-origin: left; opacity: 0; transition: opacity .25s ease;
+}
+.site-header.show-event .hdr-progress { opacity: 1; }
+/* Narrow screens: no meta line; the title gets two lines instead */
+.hdr-compact .hdr-event-meta { display: none; }
+.hdr-compact .hdr-event-title {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2;
+  white-space: normal; font-size: 14.5px; line-height: 1.22;
+}
 .nav { display: flex; gap: 4px; }
 .nav a {
   position: relative; padding: 8px 12px; font-size: 14px; color: var(--ink-2); text-decoration: none; border-radius: 8px;
@@ -740,13 +778,20 @@ html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
 /* Gallery panel: thumbnails on the right */
 .lb-panel {
   position: absolute; top: 0; right: 0; bottom: 0; z-index: 2; width: 300px;
-  display: grid; grid-template-columns: 1fr 1fr; align-content: start; gap: 8px;
-  padding: 76px 14px 14px; overflow-y: auto; overscroll-behavior: contain;
+  display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: max-content; align-content: start; gap: 8px;
+  padding: 4px 14px 14px; overflow-y: auto; overscroll-behavior: contain;
+  border-top: 72px solid rgba(20, 22, 27, .96); /* toolbar area: thumbnails scroll below it */
+  scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, .35) transparent;
   background: rgba(20, 22, 27, .96); border-left: 1px solid rgba(255, 255, 255, .08);
   transform: translateX(100%); visibility: hidden;
   transition: transform .3s var(--ease), visibility 0s linear .3s;
 }
 .lightbox.panel-open .lb-panel { transform: none; visibility: visible; transition-delay: 0s; }
+/* Rows keep their size, so a long gallery scrolls instead of squeezing the thumbnails. */
+.lb-panel::-webkit-scrollbar { width: 8px; height: 8px; }
+.lb-panel::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .3); border-radius: 4px; }
+.lb-panel::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, .5); }
+.lb-panel::-webkit-scrollbar-track { background: transparent; }
 .lb-thumb {
   position: relative; display: block; padding: 0; border: 0; border-radius: 8px; overflow: hidden; cursor: pointer;
   background: rgba(255, 255, 255, .06); opacity: .55; transition: opacity .2s ease;

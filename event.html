@@ -58,6 +58,11 @@
           <span class="brand-sub">Indian Institute of Technology Kharagpur</span>
         </span>
       </a>
+      <!-- Shows the event's title once the page title scrolls away (event.js). -->
+      <button class="hdr-event" id="hdrEvent" type="button" tabindex="-1" aria-hidden="true">
+        <span class="hdr-event-meta" id="hdrEventMeta"></span>
+        <span class="hdr-event-title" id="hdrEventTitle"></span>
+      </button>
       <nav class="nav" aria-label="Primary">
         <a href="index.html">Scholars</a>
         <a href="alumni.html">Alumni</a>
@@ -69,6 +74,7 @@
         <svg class="icon-sun" width="18" height="18"><use href="#i-sun"/></svg>
       </button>
     </div>
+    <span class="hdr-progress" id="hdrProgress" aria-hidden="true"></span>
   </header>
 
   <main id="top">

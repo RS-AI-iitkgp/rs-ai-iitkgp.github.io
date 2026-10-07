@@ -80,6 +80,53 @@
            <p class="g-note">Photos from this event will be added soon.</p>`}`;
 
     if (photos.length) setupLightbox(photos);
+    const metaBits = [cat, /\d{4}/.test(ev.date || "") ? ev.date : "", photos.length ? `${photos.length} ${photos.length === 1 ? "photo" : "photos"}` : ""];
+    setupHeaderTitle(ev.title, metaBits.filter(Boolean).join(" · "), hue(cat));
+  }
+
+  /* ---------- Event title in the header once the page title scrolls away ---------- */
+  function setupHeaderTitle(title, meta, area) {
+    const header = $("#siteHeader"), inner = $(".header-inner", header), btn = $("#hdrEvent"), bar = $("#hdrProgress");
+    const h1 = $(".ev-title", head), nav = $(".nav", header), theme = $("#themeBtn");
+    if (!btn || !h1) return;
+    $("#hdrEventTitle").textContent = title;
+    $("#hdrEventMeta").textContent = meta;
+    btn.setAttribute("aria-label", `Back to top: ${title}`);
+    btn.title = "Back to top";
+    header.style.setProperty("--area", area);
+
+    // Sit just right of the logo; run up to the nav, or (when that's too tight) up to the theme button,
+    // in which case the nav steps aside while scrolling down.
+    function layout() {
+      const base = inner.getBoundingClientRect();
+      const logo = [...header.querySelectorAll(".brand-logo")].find((i) => i.offsetWidth) || $(".brand", header);
+      const left = logo.getBoundingClientRect().right + 12 - base.left;
+      const beforeNav = nav.getBoundingClientRect().left - 24 - base.left;
+      const compact = beforeNav - left < 280;
+      const right = compact ? theme.getBoundingClientRect().left - 14 - base.left : beforeNav;
+      header.classList.toggle("hdr-compact", compact);
+      inner.style.setProperty("--hdr-left", `${Math.round(left)}px`);
+      inner.style.setProperty("--hdr-width", `${Math.max(0, Math.round(right - left))}px`);
+    }
+
+    let lastY = scrollY, goingUp = false;
+    function update() {
+      const y = scrollY;
+      if (Math.abs(y - lastY) > 6) { goingUp = y < lastY; lastY = y; }
+      const past = h1.getBoundingClientRect().bottom < header.offsetHeight;
+      // On narrow screens scrolling up brings the nav back.
+      const show = past && !(goingUp && header.classList.contains("hdr-compact"));
+      header.classList.toggle("show-event", show);
+      btn.tabIndex = show ? 0 : -1;
+      btn.setAttribute("aria-hidden", String(!show));
+      const max = document.documentElement.scrollHeight - innerHeight;
+      bar.style.setProperty("--p", max > 0 ? Math.min(1, Math.max(0, y / max)).toFixed(4) : "0");
+    }
+    btn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" }));
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", () => { layout(); update(); });
+    layout(); update();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout); // widths change once web fonts load
   }
 
   /* ---------- Full-screen photo viewer ---------- */
@@ -100,7 +147,7 @@
       </button>`).join("");
     const thumbs = [...panel.querySelectorAll(".lb-thumb")];
     const panelOpen = () => lb.classList.contains("panel-open");
-    const revealThumb = (smooth) => thumbs[index].scrollIntoView({ block: "nearest", inline: "nearest", behavior: smooth && !reduceMotion ? "smooth" : "auto" });
+    const revealThumb = (smooth) => thumbs[index].scrollIntoView({ block: "center", inline: "center", behavior: smooth && !reduceMotion ? "smooth" : "auto" });
 
     function show(i) {
       index = (i + photos.length) % photos.length;
