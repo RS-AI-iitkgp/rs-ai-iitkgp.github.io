@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Directory of PhD scholars in the Department of Artificial Intelligence, IIT Kharagpur." />
-  <title>PhD Scholars · Department of AI, IIT Kharagpur</title>
+  <meta name="description" content="Events and activities of the PhD scholars of the Department of Artificial Intelligence, IIT Kharagpur." />
+  <title>Events · Department of AI, IIT Kharagpur</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -47,9 +47,9 @@
         </span>
       </a>
       <nav class="nav" aria-label="Primary">
-        <a href="index.html" aria-current="page">Scholars</a>
+        <a href="index.html">Scholars</a>
         <a href="alumni.html">Alumni</a>
-        <a href="events.html">Events</a>
+        <a href="events.html" aria-current="page">Events</a>
         <a class="nav-contact" href="#contact">Contact</a>
       </nav>
       <button class="icon-btn theme-btn" id="themeBtn" type="button" aria-label="Toggle colour theme" title="Toggle theme">
@@ -62,22 +62,22 @@
   <main id="top">
     <section class="hero">
       <div class="container hero-inner">
-        <h1 class="enter" style="--i:0">PhD <span>Scholars</span></h1>
+        <h1 class="enter" style="--i:0">Events &amp; <span>Activities</span></h1>
         <p class="lede enter" style="--i:1">
-          Doctoral researchers at the Department of Artificial Intelligence, IIT Kharagpur.
-          Browse by name, research area or research interest.
+          Talks, celebrations and activities organised by and with the PhD scholars of the
+          Department of Artificial Intelligence, IIT Kharagpur.
         </p>
         <ul class="stats enter" style="--i:2">
-          <li><strong data-count="total">0</strong><span>Scholars</span></li>
-          <li><strong data-count="groups">0</strong><span>Research areas</span></li>
-          <li><strong data-count="batches">0</strong><span id="batchLabel">Batches</span></li>
+          <li><strong data-count="total">0</strong><span>Events</span></li>
+          <li><strong data-count="talks">0</strong><span>Talks</span></li>
+          <li><strong data-count="speakers">0</strong><span>Scholar speakers</span></li>
         </ul>
       </div>
     </section>
 
     <section class="directory container" id="directory" aria-labelledby="dirTitle">
       <div class="directory-head">
-        <h2 id="dirTitle">Directory</h2>
+        <h2 id="dirTitle">All events</h2>
         <p class="results"><span id="resultText" aria-live="polite"></span><button class="link-btn" id="clearBtn" type="button" hidden>Clear filters</button></p>
       </div>
 
@@ -92,14 +92,14 @@
         <label class="search">
           <svg width="18" height="18" aria-hidden="true"><use href="#i-search"/></svg>
           <span class="sr-only">Search</span>
-          <input id="q" type="search" enterkeyhint="search" placeholder="Search by name or research interest" autocomplete="off" spellcheck="false" />
+          <input id="q" type="search" enterkeyhint="search" placeholder="Search events, speakers or topics" autocomplete="off" spellcheck="false" />
           <kbd aria-hidden="true">/</kbd>
         </label>
         <div class="select">
-          <select id="group" aria-label="Research area" tabindex="-1" aria-hidden="true"></select>
+          <select id="group" aria-label="Category" tabindex="-1" aria-hidden="true"></select>
         </div>
         <div class="select">
-          <select id="year" aria-label="Year joined" tabindex="-1" aria-hidden="true"></select>
+          <select id="year" aria-label="Year" tabindex="-1" aria-hidden="true"></select>
         </div>
         <div class="select">
           <select id="sort" aria-label="Sort order" tabindex="-1" aria-hidden="true"></select>
@@ -119,7 +119,7 @@
         <button class="link-btn" type="button" data-clear>Clear filters</button>
       </div>
 
-      <p class="crosslink">Looking for former scholars? <a href="alumni.html">See our alumni →</a></p>
+      <p class="crosslink">Meet the people behind these events: <a href="index.html">PhD scholars →</a></p>
     </section>
   </main>
 
@@ -172,23 +172,26 @@
     <svg width="18" height="18" aria-hidden="true"><use href="#i-arrow-up"/></svg>
   </button>
 
-  <!-- Data lives in data/scholars.js — edit that file, not this page. -->
+  <!-- Data lives in data/events.js — edit that file, not this page. -->
   <script src="data/supervisors.js"></script>
-  <script src="data/scholars.js"></script>
+  <script src="data/events.js"></script>
   <script>
     window.DIRECTORY = {
-      kind: "scholar",
-      items: window.SCHOLARS,
-      noun: ["scholar", "scholars"],
-      group: { key: "area", param: "area", all: "All areas", none: "Not specified" },
-      year: { key: "joined", label: "Joined", all: "All years" },
+      kind: "event",
+      items: window.EVENTS,
+      noun: ["event", "events"],
+      group: { key: "category", param: "category", all: "All categories", none: "Other" },
+      year: { key: "date", label: "", all: "All years" },
       sorts: [
-        ["year-desc", "Joined: newest first"],
-        ["year-asc", "Joined: oldest first"],
-        ["name-asc", "Name: A–Z"],
-        ["name-desc", "Name: Z–A"],
+        ["year-desc", "Newest first"],
+        ["year-asc", "Oldest first"],
+        ["name-asc", "Title: A–Z"],
       ],
-      stats: ({ items, groups, years }) => ({ total: items.length, groups: groups.length, batches: years.length || null }),
+      stats: ({ items, years }) => ({
+        total: items.length,
+        talks: items.filter((e) => /talk|seminar/i.test(e.category || "")).length || null,
+        speakers: new Set(items.filter((e) => /scholar/i.test(e.affiliation || "")).map((e) => e.speaker)).size || null,
+      }),
       lastUpdated: "October 2026",
     };
   </script>

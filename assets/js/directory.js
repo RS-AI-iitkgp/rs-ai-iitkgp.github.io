@@ -20,8 +20,8 @@
   const byName = (a, b) => a.s.name.localeCompare(b.s.name, undefined, { sensitivity: "base" }) || a.i - b.i;
   // Entries without a real year (e.g. "YYYY") always go last.
   const byYear = (dir) => (a, b) => {
-    const x = a.s.year == null ? null : a.s.year * 12 + a.s.month;
-    const y = b.s.year == null ? null : b.s.year * 12 + b.s.month;
+    const x = a.s.year == null ? null : a.s.year * 400 + a.s.month * 32 + a.s.day;
+    const y = b.s.year == null ? null : b.s.year * 400 + b.s.month * 32 + b.s.day;
     if (x === y) return byName(a, b);
     if (x == null) return 1;
     if (y == null) return -1;
@@ -35,11 +35,20 @@
     const s = { ...raw };
     s.group = String(s[cfg.group.key] || "").trim() || NONE;
     s.yearLabel = String(s[cfg.year.key] ?? "").trim();
-    // Accepts "2024" or "Jul 2024" (month is used for ordering only).
-    const when = s.yearLabel.match(/^(?:([A-Za-z]{3})[a-z]*\.?\s+)?(\d{4})$/);
-    s.year = when ? Number(when[2]) : null;
-    s.month = when && when[1] ? Math.max(0, MONTHS.indexOf(when[1].toLowerCase())) : 0;
-    s.supervisors = (Array.isArray(s.supervisors) ? s.supervisors : [s.supervisors]).filter(Boolean);
+    // Accepts "2024", "Jul 2024" or "6 Oct 2026" (day and month are used for ordering).
+    const when = s.yearLabel.match(/^(?:(\d{1,2})\s+)?(?:([A-Za-z]{3})[a-z]*\.?\s+)?(\d{4})$/);
+    s.year = when ? Number(when[3]) : null;
+    s.month = when && when[2] ? Math.max(0, MONTHS.indexOf(when[2].toLowerCase())) : 0;
+    s.day = when && when[1] ? Number(when[1]) : 0;
+    if (cfg.kind === "event") {
+      // Map event fields onto the shared ones used by search and sorting.
+      s.name = s.title || "";
+      s.supervisors = [];
+      s.people = [].concat(s.people || []).filter(Boolean);
+      s.links = [].concat(s.links || []).filter((l) => l && l.url);
+    } else {
+      s.supervisors = (Array.isArray(s.supervisors) ? s.supervisors : [s.supervisors]).filter(Boolean);
+    }
     return s;
   });
 
@@ -111,6 +120,11 @@
     field(s.group, 1.4, true);
     field(s.topic, 1.4, true);
     field(s.thesis, 1.4, true);
+    field(s.people, 2);
+    field(s.speaker, 2);
+    field(s.affiliation, 1.4, true);
+    field(s.summary, 1.2, true);
+    field(s.venue, 1);
     if (s.year) field(s.yearLabel, 1);
     return [...map.values()];
   }
@@ -167,7 +181,29 @@
       : esc(label);
   }
 
+  function eventCardHTML(s) {
+    const big = s.day ? s.day : s.year && s.month !== null && /[a-z]/i.test(s.yearLabel) ? MONTHS[s.month] : s.year ? s.year : "TBA";
+    const small = s.day ? `${MONTHS[s.month]} ${s.year}` : s.year && /[a-z]/i.test(s.yearLabel) ? s.year : "";
+    const meta = [s.speaker && `<b>${esc(s.speaker)}</b>${s.affiliation ? `, ${esc(s.affiliation)}` : ""}`, s.venue && esc(s.venue)]
+      .filter(Boolean).join(" · ");
+    const pills = s.links.map((l) => {
+      const href = safeUrl(l.url);
+      return href ? `<a class="c-pill" href="${esc(href)}" ${href.startsWith("#") ? "" : 'target="_blank" rel="noopener"'}>${esc(l.label || "Link")} <span aria-hidden="true">↗</span></a>` : "";
+    }).join("");
+    return `
+      <div class="c-photo c-date" aria-hidden="true"><span class="d-big">${esc(big)}</span>${small ? `<span class="d-small">${esc(small)}</span>` : ""}</div>
+      <span class="c-joined c-tag">${esc(s.group)}</span>
+      <div class="c-id">
+        <h3 class="c-name">${esc(s.title)}</h3>
+        ${meta ? `<p class="c-pos">${icon(s.speaker ? "mic" : "pin", 15)}<span>${meta}</span></p>` : ""}
+      </div>
+      <p class="c-topic">${esc(s.summary || "")}</p>
+      ${s.people.length ? `<div class="c-sup"><span class="c-label">${esc(s.peopleLabel || "People")}</span>${s.people.map(esc).join(", ")}</div>` : ""}
+      <div class="c-links">${pills}</div>`;
+  }
+
   function cardHTML(s) {
+    if (cfg.kind === "event") return eventCardHTML(s);
     const alumni = cfg.kind === "alumni";
     const sups = s.supervisors;
     const text = alumni ? s.thesis : s.topic;
@@ -196,7 +232,7 @@
   const grid = $("#grid");
   const cards = ITEMS.map((s, i) => {
     const el = document.createElement("article");
-    el.className = "card reveal" + (s.supervisors.length ? "" : " no-sup");
+    el.className = "card reveal" + (s.supervisors.length || (s.people && s.people.length) ? "" : " no-sup") + (cfg.kind === "event" ? " is-event" : "");
     el.style.setProperty("--area", HUE.get(s.group));
     el.style.viewTransitionName = `${cfg.kind}-${i}`;
     el.innerHTML = cardHTML(s);
@@ -370,7 +406,7 @@
   const groupOpts = [...groupSel.options];
 
   yearSel.innerHTML = `<option value="all">${esc(cfg.year.all)}</option>` +
-    YEARS.map((y) => `<option value="${y}">${esc(cfg.year.label)} ${y}</option>`).join("");
+    YEARS.map((y) => `<option value="${y}">${esc(`${cfg.year.label} ${y}`.trim())}</option>`).join("");
   if (!YEARS.length) yearSel.closest(".select").hidden = true;
 
   sortSel.innerHTML = cfg.sorts.map(([v, label]) => `<option value="${v}">${esc(label)}</option>`).join("");
