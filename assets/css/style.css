@@ -390,6 +390,9 @@ kbd {
 /* Phones: floating search button + search panel */
 .sheet-head { display: none; }
 .search-fab { display: none; }
+.view-fab { display: none; }
+@keyframes swap-in { from { opacity: 0; transform: translateY(8px); } }
+.grid.swap { animation: swap-in .35s var(--ease); }
 .sheet-backdrop {
   position: fixed; inset: 0; z-index: 55; background: rgba(12, 14, 18, .42);
   -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
@@ -454,6 +457,19 @@ html.sheet-open { overflow: hidden; }
     transition: opacity .25s ease, transform .35s var(--ease);
   }
   .search-fab.show { opacity: 1; transform: none; pointer-events: auto; }
+  /* Grid/list toggle, sits left of the search button */
+  .view-fab {
+    position: fixed; right: calc(18px + 56px + 12px); bottom: calc(24px + env(safe-area-inset-bottom)); z-index: 50;
+    display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border-radius: 50%;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    box-shadow: 0 12px 26px -12px rgba(0, 0, 0, .35), 0 3px 8px rgba(0, 0, 0, .08);
+    opacity: 0; transform: translateY(18px) scale(.85); pointer-events: none;
+    transition: opacity .25s ease .04s, transform .35s var(--ease) .04s;
+  }
+  .view-fab.show { opacity: 1; transform: none; pointer-events: auto; }
+  .view-fab:active { transform: scale(.92); }
+  .view-fab .vf-grid, .view-fab[data-view="list"] .vf-list { display: none; }
+  .view-fab[data-view="list"] .vf-grid { display: block; }
   .search-fab:active { transform: scale(.92); }
   .fab-badge {
     position: absolute; top: -3px; right: -3px; display: grid; place-items: center;

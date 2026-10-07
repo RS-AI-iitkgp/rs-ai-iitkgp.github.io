@@ -432,6 +432,13 @@
     groupSel.closest(".select").classList.toggle("is-active", state.group !== "all");
     yearSel.closest(".select").classList.toggle("is-active", state.year !== "all");
     document.querySelectorAll(".seg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === state.view)));
+    const vf = $("#viewFab");
+    if (vf) {
+      const next = state.view === "grid" ? "list" : "grid";
+      vf.dataset.view = state.view;
+      vf.setAttribute("aria-label", `Switch to ${next} view`);
+      vf.title = `Switch to ${next} view`;
+    }
 
     const [one, many] = cfg.noun;
     const filtered = state.q.trim() || state.group !== "all" || state.year !== "all";
@@ -533,6 +540,7 @@
   const toolbar = $("#toolbar");
   const spacer = $("#toolbarSpacer");
   const fab = $("#searchFab");
+  const viewFab = $("#viewFab");
   const backdrop = $("#sheetBackdrop");
   let sheetOpen = false;
   let sheetSnapshot = "";
@@ -541,6 +549,7 @@
     const headerH = $("#siteHeader").offsetHeight;
     const past = !sheetOpen && phone.matches && toolbar.getBoundingClientRect().bottom < headerH;
     fab.classList.toggle("show", past);
+    viewFab.classList.toggle("show", past);
   }
 
   function openSheet() {
@@ -582,6 +591,19 @@
   }
 
   fab.addEventListener("click", openSheet);
+
+  // Switch grid/list while scrolled, keeping the card you were looking at in place.
+  viewFab.addEventListener("click", () => {
+    const top = $("#siteHeader").offsetHeight;
+    const anchor = [...grid.children].find((el) => !el.hidden && el.getBoundingClientRect().bottom > top + 8); // first card on screen
+    const before = anchor ? anchor.getBoundingClientRect().top : 0;
+    const view = state.view === "grid" ? "list" : "grid";
+    try { localStorage.setItem("doai-view", view); } catch (e) {}
+    settle();
+    setState({ view }, false);
+    if (anchor) window.scrollBy({ top: anchor.getBoundingClientRect().top - before, behavior: "instant" });
+    if (!reduceMotion) { grid.classList.remove("swap"); void grid.offsetWidth; grid.classList.add("swap"); }
+  });
   $("#sheetDone").addEventListener("click", () => closeSheet());
   backdrop.addEventListener("click", () => closeSheet());
   document.addEventListener("keydown", (e) => {
