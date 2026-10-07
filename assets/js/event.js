@@ -59,7 +59,9 @@
 
     const photos = [].concat(ev.photos || [])
       .map((p) => (typeof p === "string" ? { src: p } : p))
-      .filter((p) => p && safeUrl(p.src));
+      .filter((p) => p && safeUrl(p.src))
+      // Small copy for tiles and the panel: images/events/<id>/thumbs/<same name> unless `thumb` is given.
+      .map((p) => ({ ...p, src: safeUrl(p.src), thumb: safeUrl(p.thumb) || safeUrl(p.src).replace(/([^/]+)$/, "thumbs/$1") }));
 
     main.innerHTML = `
       <div class="directory-head">
@@ -69,8 +71,8 @@
       ${photos.length
         ? `<div class="gallery">${photos.map((p, i) => `
             <button class="g-item" type="button" data-i="${i}" aria-label="Open photo ${i + 1} of ${photos.length}${p.caption ? `: ${esc(p.caption)}` : ""}">
-              <img src="${esc(safeUrl(p.src))}" alt="${esc(p.caption || `${ev.title} — photo ${i + 1}`)}" loading="lazy" decoding="async"
-                   onload="this.classList.add('loaded')" onerror="this.closest('.g-item').classList.add('broken')">
+              <img src="${esc(p.thumb)}" data-full="${esc(p.src)}" alt="${esc(p.caption || `${ev.title} — photo ${i + 1}`)}" loading="lazy" decoding="async"
+                   onload="this.classList.add('loaded')" onerror="if (this.dataset.full) { this.src = this.dataset.full; this.removeAttribute('data-full'); } else this.closest('.g-item').classList.add('broken');">
               ${p.caption ? `<span class="g-cap">${esc(p.caption)}</span>` : ""}
             </button>`).join("")}</div>`
         : `<div class="gallery is-empty" aria-label="Photos coming soon">${Array.from({ length: 6 }, (_, i) => `
@@ -81,17 +83,20 @@
   }
 
   /* ---------- Full-screen photo viewer ---------- */
-  // Extras: slideshow (Space), thumbnail panel on the right (G; bottom strip on phones), browser full screen (F).
+  // Extras: zoom & pan (double-click/tap, scroll, pinch, + / - / 0), slideshow (Space),
+  // thumbnail panel on the right (G; bottom strip on phones), browser full screen (F).
   function setupLightbox(photos) {
     const lb = $("#lightbox"), img = $("#lbImg"), cap = $("#lbCap"), count = $("#lbCount");
     const panel = $("#lbPanel"), progress = $(".lb-progress", lb);
-    const playBtn = $(".lb-play", lb), panelBtn = $(".lb-panel-btn", lb), fsBtn = $(".lb-fs", lb);
+    const playBtn = $(".lb-play", lb), panelBtn = $(".lb-panel-btn", lb), fsBtn = $(".lb-fs", lb), zoomBtn = $(".lb-zoom", lb);
+    const stage = $(".lb-stage", lb);
     const SLIDE_MS = 4000, PANEL_KEY = "doai-lb-panel";
-    let index = 0, lastFocus = null, playing = false, slideTimer = 0;
+    let index = 0, lastFocus = null, playing = false, slideTimer = 0, loadToken = 0;
+    let ratio = 0, fullWidth = 0; // current photo's aspect ratio and full-size pixel width
 
     panel.innerHTML = photos.map((p, i) => `
       <button class="lb-thumb" type="button" data-i="${i}" aria-label="Photo ${i + 1}${p.caption ? `: ${esc(p.caption)}` : ""}">
-        <img src="${esc(safeUrl(p.src))}" alt="" loading="lazy" decoding="async">
+        <img src="${esc(p.thumb)}" data-full="${esc(p.src)}" alt="" loading="lazy" decoding="async" onerror="if (this.dataset.full) { this.src = this.dataset.full; this.removeAttribute('data-full'); }">
       </button>`).join("");
     const thumbs = [...panel.querySelectorAll(".lb-thumb")];
     const panelOpen = () => lb.classList.contains("panel-open");
@@ -99,10 +104,18 @@
 
     function show(i) {
       index = (i + photos.length) % photos.length;
-      const p = photos[index];
+      const p = photos[index], token = ++loadToken;
+      resetZoom();
+      ratio = 0; fullWidth = 0;
+      img.style.width = img.style.height = "";
       img.classList.remove("ready");
-      img.onload = () => img.classList.add("ready");
-      img.src = safeUrl(p.src);
+      img.onload = () => { ratio = img.naturalWidth / img.naturalHeight; fit(); img.classList.add("ready"); };
+      img.onerror = () => { if (token === loadToken && img.getAttribute("src") !== p.src) img.src = p.src; };
+      // The thumbnail is usually cached already: show it at once, then swap in the full photo when it arrives.
+      img.src = p.thumb;
+      const full = new Image();
+      full.onload = () => { if (token === loadToken) { fullWidth = full.naturalWidth; img.src = p.src; } };
+      full.src = p.src;
       img.alt = p.caption || `${ev.title} — photo ${index + 1}`;
       cap.textContent = p.caption || "";
       cap.hidden = !p.caption;
@@ -111,8 +124,125 @@
       if (panelOpen()) revealThumb(true);
       if (playing) schedule(); // any move restarts the slideshow countdown
       // Preload neighbours for instant next/previous.
-      [index + 1, index - 1].forEach((j) => { const n = photos[(j + photos.length) % photos.length]; if (n) new Image().src = safeUrl(n.src); });
+      [index + 1, index - 1].forEach((j) => { const n = photos[(j + photos.length) % photos.length]; if (n) new Image().src = n.src; });
     }
+
+    // Size the photo to fit the stage (also while the smaller thumbnail is showing).
+    function fit() {
+      if (!ratio) return;
+      const maxW = stage.clientWidth, maxH = parseFloat(getComputedStyle(img).maxHeight) || stage.clientHeight;
+      const w = Math.min(maxW, maxH * ratio);
+      img.style.width = `${Math.round(w)}px`;
+      img.style.height = `${Math.round(w / ratio)}px`;
+    }
+    if ("ResizeObserver" in window) new ResizeObserver(() => { if (!lb.hidden) { fit(); resetZoom(); } }).observe(stage);
+
+    /* Zoom & pan — so faces in big group photos can be seen at full resolution */
+    let z = 1, tx = 0, ty = 0;
+    const nativeZoom = () => (fullWidth && img.offsetWidth ? fullWidth / img.offsetWidth : 2);
+    const maxZoom = () => Math.max(2, nativeZoom() * 1.5);
+    function baseCenter() { // image centre without the zoom transform
+      const r = stage.getBoundingClientRect();
+      return { x: r.left + img.offsetLeft + img.offsetWidth / 2, y: r.top + img.offsetTop + img.offsetHeight / 2 };
+    }
+    function panArea() { // the visible part of the viewer (minus the open panel)
+      const r = lb.getBoundingClientRect(), a = { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+      if (lb.classList.contains("panel-open")) {
+        const pr = panel.getBoundingClientRect();
+        if (pr.top > r.top + 1) a.bottom = pr.top; else a.right = pr.left;
+      }
+      return a;
+    }
+    function clampPan() {
+      if (z <= 1) { tx = ty = 0; return; }
+      const b = baseCenter(), a = panArea(), w = img.offsetWidth * z, h = img.offsetHeight * z;
+      const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+      // Keep the zoomed photo covering the view; on an axis where it's smaller than the view, keep it centred.
+      tx = w <= a.right - a.left ? 0 : clamp(tx, a.right - b.x - w / 2, a.left - b.x + w / 2);
+      ty = h <= a.bottom - a.top ? 0 : clamp(ty, a.bottom - b.y - h / 2, a.top - b.y + h / 2);
+    }
+    function applyZoom() {
+      const on = z > 1.001;
+      lb.classList.toggle("zoomed", on);
+      zoomBtn.setAttribute("aria-pressed", String(on));
+      zoomBtn.setAttribute("aria-label", on ? "Zoom out" : "Zoom in");
+      img.style.transform = on ? `translate(${tx}px, ${ty}px) scale(${z})` : "";
+      if (on && playing) setPlaying(false);
+    }
+    function zoomTo(nz, px, py) { // zoom, keeping the point (px, py) where it is
+      nz = Math.min(maxZoom(), Math.max(1, nz));
+      const b = baseCenter(), k = nz / z, cx = b.x + tx, cy = b.y + ty;
+      tx = px - (px - cx) * k - b.x;
+      ty = py - (py - cy) * k - b.y;
+      z = nz;
+      clampPan();
+      applyZoom();
+    }
+    function resetZoom() { z = 1; tx = ty = 0; applyZoom(); }
+    function toggleZoom(px, py) {
+      if (z > 1.001) return resetZoom();
+      const c = baseCenter();
+      zoomTo(Math.max(2, nativeZoom()), px ?? c.x, py ?? c.y); // 1:1 pixels for large photos
+    }
+    const zoomBy = (f) => { const c = baseCenter(); zoomTo(z * f, c.x + tx, c.y + ty); };
+
+    // Mouse drag, touch drag, pinch and double-tap — all through pointer events on the photo.
+    const pts = new Map();
+    let drag = null, pinch = null, moved = false, gestured = false, lastTap = 0, lastType = "mouse", wheelTimer = 0;
+    const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+    img.addEventListener("pointerdown", (e) => {
+      lastType = e.pointerType;
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      e.preventDefault();
+      img.setPointerCapture(e.pointerId);
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      img.classList.add("dragging");
+      if (pts.size === 1) moved = false;
+      if (pts.size === 2) {
+        const [a, b] = [...pts.values()];
+        pinch = { d: dist(a, b), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 };
+        drag = null; gestured = true;
+      } else if (z > 1) drag = { x: e.clientX, y: e.clientY, tx, ty };
+    });
+    img.addEventListener("pointermove", (e) => {
+      if (!pts.has(e.pointerId)) return;
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pinch && pts.size >= 2) {
+        const [a, b] = [...pts.values()], mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, d = dist(a, b);
+        tx += mx - pinch.mx; ty += my - pinch.my;
+        zoomTo(z * d / pinch.d, mx, my);
+        pinch = { d, mx, my };
+        moved = true;
+      } else if (drag) {
+        const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+        if (Math.abs(dx) + Math.abs(dy) > 4) moved = true;
+        tx = drag.tx + dx; ty = drag.ty + dy;
+        clampPan(); applyZoom();
+      }
+    });
+    function pointerEnd(e) {
+      if (!pts.delete(e.pointerId)) return;
+      if (pts.size < 2) pinch = null;
+      if (pts.size === 1 && z > 1) { const [q] = [...pts.values()]; drag = { x: q.x, y: q.y, tx, ty }; } // keep panning with one finger
+      if (!pts.size) { drag = null; img.classList.remove("dragging"); }
+      if (e.type === "pointerup" && e.pointerType === "touch" && !moved && !pts.size) { // double-tap
+        if (e.timeStamp - lastTap < 320) { toggleZoom(e.clientX, e.clientY); lastTap = 0; } else lastTap = e.timeStamp;
+      }
+    }
+    img.addEventListener("pointerup", pointerEnd);
+    img.addEventListener("pointercancel", pointerEnd);
+    img.addEventListener("dblclick", (e) => { if (lastType !== "touch") toggleZoom(e.clientX, e.clientY); });
+    img.addEventListener("dragstart", (e) => e.preventDefault());
+    lb.addEventListener("wheel", (e) => {
+      if (e.target.closest(".lb-panel")) return;
+      e.preventDefault();
+      const dy = e.deltaY * (e.deltaMode === 1 ? 40 : 1);
+      img.classList.add("dragging"); // no easing while scrolling
+      clearTimeout(wheelTimer);
+      wheelTimer = setTimeout(() => { if (!pts.size) img.classList.remove("dragging"); }, 160);
+      zoomTo(z * Math.exp(-dy * (e.ctrlKey ? 0.01 : 0.0015)), e.clientX, e.clientY);
+    }, { passive: false });
+    zoomBtn.addEventListener("click", () => toggleZoom());
 
     /* Slideshow */
     function schedule() {
@@ -174,6 +304,7 @@
     }
     function close() {
       setPlaying(false);
+      resetZoom();
       exitFs();
       lb.classList.remove("show");
       document.documentElement.classList.remove("sheet-open");
@@ -197,6 +328,9 @@
       if (lb.hidden || e.ctrlKey || e.metaKey || e.altKey) return;
       const k = e.key.toLowerCase();
       if (e.key === "Escape") { if (!fsElement()) close(); } // in full screen, Esc only leaves full screen
+      else if (e.key === "+" || e.key === "=") zoomBy(1.5);
+      else if (e.key === "-" || e.key === "_") zoomBy(1 / 1.5);
+      else if (e.key === "0") resetZoom();
       else if (e.key === "ArrowRight") show(index + 1);
       else if (e.key === "ArrowLeft") show(index - 1);
       else if (e.key === " ") { e.preventDefault(); setPlaying(!playing); }
@@ -213,9 +347,13 @@
     document.addEventListener("keyup", (e) => { if (!lb.hidden && e.key === " ") e.preventDefault(); });
     // Swipe on touch screens (not on the thumbnail strip, which scrolls).
     let x0 = null;
-    lb.addEventListener("touchstart", (e) => { x0 = e.target.closest(".lb-panel") ? null : e.touches[0].clientX; }, { passive: true });
+    lb.addEventListener("touchstart", (e) => {
+      if (e.touches.length === 1) gestured = false;
+      x0 = e.target.closest(".lb-panel") || e.touches.length > 1 || z > 1 ? null : e.touches[0].clientX;
+    }, { passive: true });
     lb.addEventListener("touchend", (e) => {
-      if (x0 == null) return;
+      if (e.touches.length) return;
+      if (x0 == null || gestured || z > 1) { x0 = null; return; }
       const dx = e.changedTouches[0].clientX - x0;
       if (Math.abs(dx) > 50) show(index + (dx < 0 ? 1 : -1));
       x0 = null;

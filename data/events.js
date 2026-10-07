@@ -3,7 +3,7 @@
    ------------------------------------------------------------------
    title        Event name
    date         "6 Oct 2026", "Sep 2025" or "2024" ("YYYY" = not set yet)
-   category     Used for the filter and colour, e.g. "Research Scholars' Day",
+   category     Used for the filter and colour, e.g. "RS Day",
                 "Celebration", "IdoAI Talk Series", "Student Activity".
                 Keep spellings consistent.
    speaker      (talks) Speaker name;  affiliation  their organisation
@@ -18,7 +18,21 @@
    photos       Photos in images/events/<id>/, e.g.
                 ["images/events/teachers-day-2026/01.jpg", …]
                 or with captions: [{ src: "…/01.jpg", caption: "…" }, …]
+                Gallery tiles use a small copy from images/events/<id>/thumbs/
+                (same file name) when it exists; give `thumb` to use another file.
                 While empty, the page shows "Photos coming soon" tiles.
+   highlights   Photo numbers that slide by on the event's card, e.g.
+                [1, 8, 27]; leave out to use the first three photos.
+
+   Card slides without a detail page (e.g. the IdoAI card):
+   slides       Images that slide by on the card, e.g. ["images/events/idoai/01.jpg", …]
+   slidesLink   Where clicking the slides goes, e.g. an external gallery
+
+   Photo files  JPG named in display order (01.jpg, 02.jpg, …), camera
+                metadata (GPS) removed. Longest side about 2400 px; keep
+                4000 px or the full camera size for group/crowd photos so
+                faces can be zoomed into. Thumbnails: 640 px, same name, in
+                thumbs/.
 
    Sources: IdoAI talk series website (idoai-iitkgp.github.io) and the
    PhD scholars' Teachers' Day 2025 sheet.
@@ -29,14 +43,74 @@ window.EVENTS = [
   // { title: "Event name", date: "12 Mar 2027", category: "Student Activity", venue: "Department of AI, IIT Kharagpur", summary: "What happened, in a line or two.", links: [{ label: "Photos", url: "https://…" }] },
 
   // ---- Research Scholars' Day & Foundation Day ----
-  { id: "rs-day-foundation-day-2026", title: "Research Scholars' Day & Foundation Day", date: "30 Aug 2026", category: "Research Scholars' Day", venue: "Kalidas Auditorium, IIT Kharagpur",
+  { id: "rs-day-foundation-day-2026", title: "Research Scholars' Day & Foundation Day", date: "29 Aug 2026", category: "RS Day", venue: "Kalidas Auditorium, IIT Kharagpur",
     summary: "The Department of AI celebrated its Foundation Day together with Research Scholars' Day, showcasing the work of its PhD scholars.", links: [],
-    details: [], photos: [] },
+    details: [], highlights: [8, 20, 28, 45, 47, 55], photos: [
+      { src: "images/events/rs-day-foundation-day-2026/01.jpg", caption: "Foundation Day & Research Scholars' Day at Kalidas Auditorium" },
+      { src: "images/events/rs-day-foundation-day-2026/02.jpg", caption: "Poster session" },
+      { src: "images/events/rs-day-foundation-day-2026/03.jpg", caption: "The stage at Kalidas Auditorium" },
+      { src: "images/events/rs-day-foundation-day-2026/04.jpg", caption: "Poster session" },
+      { src: "images/events/rs-day-foundation-day-2026/05.jpg", caption: "The hosts open the programme" },
+      { src: "images/events/rs-day-foundation-day-2026/06.jpg", caption: "Guests on stage" },
+      { src: "images/events/rs-day-foundation-day-2026/07.jpg", caption: "Address to the audience" },
+      { src: "images/events/rs-day-foundation-day-2026/08.jpg", caption: "Inaugural speech by the Director, Prof. Suman Chakraborty" },
+      { src: "images/events/rs-day-foundation-day-2026/09.jpg", caption: "In the audience" },
+      { src: "images/events/rs-day-foundation-day-2026/10.jpg", caption: "The audience" },
+      { src: "images/events/rs-day-foundation-day-2026/11.jpg", caption: "Inaugural speech by the Director" },
+      { src: "images/events/rs-day-foundation-day-2026/12.jpg", caption: "In the audience" },
+      { src: "images/events/rs-day-foundation-day-2026/13.jpg", caption: "Address at the podium" },
+      { src: "images/events/rs-day-foundation-day-2026/14.jpg", caption: "Address at the podium" },
+      { src: "images/events/rs-day-foundation-day-2026/15.jpg", caption: "Address at the podium" },
+      { src: "images/events/rs-day-foundation-day-2026/16.jpg", caption: "Faculty and guests on stage" },
+      { src: "images/events/rs-day-foundation-day-2026/17.jpg", caption: "Tea break" },
+      { src: "images/events/rs-day-foundation-day-2026/18.jpg", caption: "Tea break" },
+      { src: "images/events/rs-day-foundation-day-2026/19.jpg", caption: "Talk: Forces behind AI's rise" },
+      { src: "images/events/rs-day-foundation-day-2026/20.jpg", caption: "Panel discussion on the future of the Department of AI" },
+      { src: "images/events/rs-day-foundation-day-2026/21.jpg", caption: "Panel discussion" },
+      { src: "images/events/rs-day-foundation-day-2026/22.jpg", caption: "Panel discussion" },
+      { src: "images/events/rs-day-foundation-day-2026/23.jpg", caption: "The audience" },
+      { src: "images/events/rs-day-foundation-day-2026/24.jpg", caption: "The audience" },
+      { src: "images/events/rs-day-foundation-day-2026/25.jpg", caption: "A question from the audience" },
+      { src: "images/events/rs-day-foundation-day-2026/26.jpg", caption: "A question from the audience" },
+      { src: "images/events/rs-day-foundation-day-2026/27.jpg", caption: "The panel" },
+      { src: "images/events/rs-day-foundation-day-2026/28.jpg", caption: "Group photo" },
+      { src: "images/events/rs-day-foundation-day-2026/29.jpg", caption: "Group photo — left" },
+      { src: "images/events/rs-day-foundation-day-2026/30.jpg", caption: "Group photo — centre" },
+      { src: "images/events/rs-day-foundation-day-2026/31.jpg", caption: "Group photo — right" },
+      { src: "images/events/rs-day-foundation-day-2026/32.jpg", caption: "Group photo — far right" },
+      { src: "images/events/rs-day-foundation-day-2026/33.jpg", caption: "Research scholar presentation" },
+      { src: "images/events/rs-day-foundation-day-2026/34.jpg", caption: "Questions from the audience" },
+      { src: "images/events/rs-day-foundation-day-2026/35.jpg", caption: "Research scholar presentation" },
+      { src: "images/events/rs-day-foundation-day-2026/36.jpg", caption: "Questions from the audience" },
+      { src: "images/events/rs-day-foundation-day-2026/37.jpg", caption: "Research scholar presentation" },
+      { src: "images/events/rs-day-foundation-day-2026/38.jpg", caption: "Research scholar presentation: Generative AI for Materials Science" },
+      { src: "images/events/rs-day-foundation-day-2026/39.jpg", caption: "In the audience" },
+      { src: "images/events/rs-day-foundation-day-2026/40.jpg", caption: "Questions from the audience" },
+      { src: "images/events/rs-day-foundation-day-2026/41.jpg", caption: "Questions from the audience" },
+      { src: "images/events/rs-day-foundation-day-2026/42.jpg", caption: "Research scholar presentation" },
+      { src: "images/events/rs-day-foundation-day-2026/43.jpg", caption: "Research scholar presentation" },
+      { src: "images/events/rs-day-foundation-day-2026/44.jpg", caption: "Research scholar presentation" },
+      { src: "images/events/rs-day-foundation-day-2026/45.jpg", caption: "Poster session" },
+      { src: "images/events/rs-day-foundation-day-2026/46.jpg", caption: "Poster session" },
+      { src: "images/events/rs-day-foundation-day-2026/47.jpg", caption: "Award presentation" },
+      { src: "images/events/rs-day-foundation-day-2026/48.jpg", caption: "Award presentation" },
+      { src: "images/events/rs-day-foundation-day-2026/49.jpg", caption: "Award presentation" },
+      { src: "images/events/rs-day-foundation-day-2026/50.jpg", caption: "Award presentation" },
+      { src: "images/events/rs-day-foundation-day-2026/51.jpg", caption: "At the podium" },
+      { src: "images/events/rs-day-foundation-day-2026/52.jpg", caption: "At the podium" },
+      { src: "images/events/rs-day-foundation-day-2026/53.jpg", caption: "Award presentation" },
+      { src: "images/events/rs-day-foundation-day-2026/54.jpg", caption: "Award presentation" },
+      { src: "images/events/rs-day-foundation-day-2026/55.jpg", caption: "Cultural programme" },
+      { src: "images/events/rs-day-foundation-day-2026/56.jpg", caption: "Cultural programme" },
+      { src: "images/events/rs-day-foundation-day-2026/57.jpg", caption: "Cultural programme" },
+      { src: "images/events/rs-day-foundation-day-2026/58.jpg", caption: "Cultural programme" },
+      { src: "images/events/rs-day-foundation-day-2026/59.jpg", caption: "Cultural programme" },
+    ] },
 
   // ---- Teachers' Day ----
   { id: "teachers-day-2026", title: "Teachers' Day Celebration 2026", date: "7 Sep 2026", category: "Celebration", venue: "Department of AI, IIT Kharagpur",
     summary: "The PhD scholars of the department celebrated Teachers' Day to thank their supervisors and faculty mentors.", links: [],
-    details: [], photos: [
+    details: [], highlights: [1, 3, 5], photos: [
       { src: "images/events/teachers-day-2026/01.jpg", caption: "The decorated venue" },
       { src: "images/events/teachers-day-2026/02.jpg", caption: "Faculty and scholars at the celebration" },
       { src: "images/events/teachers-day-2026/03.jpg", caption: "Cutting the cake" },
@@ -45,7 +119,7 @@ window.EVENTS = [
     ] },
   { id: "teachers-day-2025", title: "Teachers' Day Celebration 2025", date: "8 Sep 2025", category: "Celebration", venue: "Department of AI, IIT Kharagpur",
     summary: "The PhD scholars of the department organised a Teachers' Day celebration to thank their supervisors and faculty mentors, with personalised cards and tokens of appreciation.", links: [],
-    details: [], photos: [
+    details: [], highlights: [3, 7, 9], photos: [
       { src: "images/events/teachers-day-2025/01.jpg", caption: "The Department of AI inauguration plaque" },
       { src: "images/events/teachers-day-2025/02.jpg", caption: "Faculty members at the celebration" },
       { src: "images/events/teachers-day-2025/03.jpg", caption: "Lighting the lamp" },
@@ -61,7 +135,10 @@ window.EVENTS = [
     ] },
 
   // ---- IdoAI talk series ----
+  // Card slides: the 4 most recent photos from the IdoAI gallery (idoai-iitkgp.github.io/gallery.html), cropped to 16:9.
   { title: "IdoAI — Interdisciplinary Opportunities with AI", date: "21 Jul 2025", category: "IdoAI Talk Series", venue: "CRR Building, IIT Kharagpur",
+    slides: ["images/events/idoai/01.jpg", "images/events/idoai/02.jpg", "images/events/idoai/03.jpg", "images/events/idoai/04.jpg"],
+    slidesLink: "https://idoai-iitkgp.github.io/",
     summary: "The department's weekly talk series, every Tuesday 5–6 PM, coordinated by PhD scholars. The inaugural session featured speakers from the University of South Florida, Princeton University, Indian Railways and the Zoological Survey of India.", 
     links: [{ label: "Talk series", url: "https://idoai-iitkgp.github.io/" }, { label: "All talks", url: "https://idoai-iitkgp.github.io/events.html" }, { label: "Propose a talk", url: "https://forms.gle/89a4wQrrdy2YnLNX6" }] },
 ];

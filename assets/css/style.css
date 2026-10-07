@@ -361,6 +361,29 @@ kbd {
 .lt-copy:hover { background: color-mix(in srgb, var(--bg) 26%, transparent); }
 .lt-copy:focus-visible { outline: 2px solid var(--bg); outline-offset: 1px; }
 
+/* Event cards: highlight photos across the top, sliding left every few seconds (directory.js) */
+.card.has-media {
+  grid-template-areas: "media media" "mono joined" "id id" "topic topic" "sup sup" "links links";
+  grid-template-rows: auto auto auto 1fr auto auto;
+}
+.card.has-media::before { z-index: 1; }
+.c-media {
+  grid-area: media; position: relative; display: block; overflow: hidden;
+  margin: -22px -22px 18px; aspect-ratio: 16 / 9; background: color-mix(in srgb, var(--area) 10%, var(--surface));
+}
+.cm-track { display: flex; height: 100%; transition: transform .8s var(--ease); }
+.cm-track.no-anim { transition: none; }
+/* Asked for explicitly, so the slide keeps moving even with "reduce motion" on (overrides the global rule below). */
+.cm-track:not(.no-anim) { transition-duration: .8s !important; }
+.cm-track img { display: block; flex: 0 0 100%; width: 100%; height: 100%; object-fit: cover; }
+.cm-dots { position: absolute; left: 0; right: 0; bottom: 10px; display: flex; justify-content: center; gap: 5px; pointer-events: none; }
+.cm-dot {
+  width: 6px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .6); box-shadow: 0 0 0 1px rgba(0, 0, 0, .18);
+  transition: width .3s var(--ease), background-color .3s ease;
+}
+.cm-dot.on { width: 16px; background: #fff; }
+.grid.is-list .c-media { display: none; }
+
 /* Event cards: calendar-style date tile, category tag, link buttons */
 .c-date { flex-direction: column; gap: 4px; text-transform: capitalize; }
 .c-date .d-big { font: 700 38px/1 var(--display); letter-spacing: -.02em; }
@@ -686,7 +709,15 @@ html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
 .lightbox.single .lb-prev, .lightbox.single .lb-next { display: none; }
 .lb-count { position: absolute; top: 26px; left: 50%; transform: translateX(-50%); color: rgba(255, 255, 255, .75); font-size: 13.5px; font-variant-numeric: tabular-nums; }
 
-/* Viewer toolbar: slideshow · gallery panel · full screen · close */
+/* Zoom & pan (sizes and transforms are set by event.js) */
+.lb-figure img { cursor: zoom-in; touch-action: none; user-select: none; -webkit-user-select: none; }
+.lb-figure img.dragging { transition: opacity .25s ease; } /* follow the pointer without easing */
+.lightbox.zoomed .lb-figure img { cursor: grab; }
+.lightbox.zoomed .lb-figure img.dragging { cursor: grabbing; }
+.lb-figure figcaption { transition: opacity .2s ease; }
+.lightbox.zoomed .lb-figure figcaption { opacity: 0; }
+
+/* Viewer toolbar: zoom · slideshow · gallery panel · full screen · close */
 .lb-tools { position: absolute; top: 14px; right: 14px; z-index: 3; display: flex; gap: 8px; }
 .lb-tools .lb-btn { position: relative; }
 .lb-btn[hidden] { display: none; }

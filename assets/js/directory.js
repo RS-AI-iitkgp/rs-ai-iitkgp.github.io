@@ -13,6 +13,8 @@
 
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const safeUrl = (u) => (/^(https?:\/\/|#)/i.test(String(u || "").trim()) ? String(u).trim() : "");
+  // Image paths: web links or plain relative paths like images/events/x/01.jpg.
+  const imgUrl = (u) => { const v = String(u || "").trim(); return /^(https?:\/\/|[\w-][\w./-]*$)/i.test(v) ? v : ""; };
   const initials = (name) => {
     const parts = String(name).replace(/^(dr|mr|ms|mrs)\.?\s+/i, "").split(/\s+/).filter(Boolean);
     return ((parts[0]?.[0] || "") + (parts.length > 1 ? parts[parts.length - 1][0] : "")).toUpperCase();
@@ -46,6 +48,13 @@
       s.supervisors = [];
       s.people = [].concat(s.people || []).filter(Boolean);
       s.links = [].concat(s.links || []).filter((l) => l && l.url);
+      // Card slideshow: the chosen photo numbers (default: first three), as { thumb, full } URLs.
+      const photos = [].concat(s.photos || []).map((p) => imgUrl(typeof p === "string" ? p : p && p.src)).filter(Boolean);
+      const picks = [].concat(s.highlights || []).map((n) => photos[Number(n) - 1]).filter(Boolean);
+      s.highlights = s.id ? (picks.length ? picks : photos.slice(0, 3)).map((full) => ({ full, thumb: full.replace(/([^/]+)$/, "thumbs/$1") })) : [];
+      // Cards without a detail page can still have slides (already card-sized) that link elsewhere.
+      s.slidesLink = safeUrl(s.slidesLink);
+      if (!s.id && s.slidesLink) s.highlights = [].concat(s.slides || []).map(imgUrl).filter(Boolean).map((u) => ({ full: u, thumb: u }));
     } else {
       s.supervisors = (Array.isArray(s.supervisors) ? s.supervisors : [s.supervisors]).filter(Boolean);
       if (cfg.kind === "scholar") {
@@ -197,11 +206,21 @@
       const href = safeUrl(l.url);
       return href ? `<a class="c-pill" href="${esc(href)}" ${href.startsWith("#") ? "" : 'target="_blank" rel="noopener"'}>${esc(l.label || "Link")} <span aria-hidden="true">↗</span></a>` : "";
     }).join("");
-    return `
+    // Highlight photos (a copy of the first at the end lets the strip loop seamlessly).
+    const hl = s.highlights;
+    const mediaHref = detail || s.slidesLink;
+    const external = !detail && s.slidesLink ? ' target="_blank" rel="noopener"' : "";
+    const media = mediaHref && hl.length
+      ? `<a class="c-media" href="${esc(mediaHref)}"${external} tabindex="-1" aria-hidden="true">
+          <span class="cm-track">${[...hl, ...(hl.length > 1 ? [hl[0]] : [])].map((h) => `<img src="${esc(h.thumb)}" data-full="${esc(h.full)}" alt="" loading="lazy" decoding="async" onerror="if (this.dataset.full) { this.src = this.dataset.full; this.removeAttribute('data-full'); }">`).join("")}</span>
+          ${hl.length > 1 ? `<span class="cm-dots">${hl.map((_, i) => `<span class="cm-dot${i ? "" : " on"}"></span>`).join("")}</span>` : ""}
+        </a>`
+      : "";
+    return `${media}
       <div class="c-photo c-date" aria-hidden="true"><span class="d-big">${esc(big)}</span>${small ? `<span class="d-small">${esc(small)}</span>` : ""}</div>
       <span class="c-joined c-tag">${esc(s.group)}</span>
       <div class="c-id">
-        <h3 class="c-name">${detail ? `<a class="c-title-link" href="${detail}">${esc(s.title)}</a>` : esc(s.title)}</h3>
+        <h3 class="c-name">${mediaHref ? `<a class="c-title-link" href="${esc(mediaHref)}"${external}>${esc(s.title)}</a>` : esc(s.title)}</h3>
         ${meta ? `<p class="c-pos">${icon(s.speaker ? "mic" : "pin", 15)}<span>${meta}</span></p>` : ""}
       </div>
       <p class="c-topic">${esc(s.summary || "")}</p>
@@ -239,12 +258,59 @@
   const grid = $("#grid");
   const cards = ITEMS.map((s, i) => {
     const el = document.createElement("article");
-    el.className = "card reveal" + (s.supervisors.length ? "" : " no-sup") + (cfg.kind === "event" ? " is-event" : "");
+    el.className = "card reveal" + (s.supervisors.length ? "" : " no-sup") + (cfg.kind === "event" ? " is-event" : "")
+      + (s.highlights && s.highlights.length ? " has-media" : "");
     el.style.setProperty("--area", HUE.get(s.group));
     el.style.viewTransitionName = `${cfg.kind}-${i}`;
     el.innerHTML = cardHTML(s);
     return { s, el, i, index: buildIndex(s), hit: null };
   });
+
+  /* ---------- Event cards: highlight photos sliding by ---------- */
+  // Each card moves to its next photo every few seconds while on screen; hovering or focusing the card pauses it.
+  const SLIDE_MS = 3800;
+  const strips = cards.map(({ el }, k) => {
+    const track = el.querySelector(".cm-track");
+    if (!track || track.children.length < 3) return null; // single photo: nothing to slide
+    return { el, track, dots: [...el.querySelectorAll(".cm-dot")], n: track.children.length - 1, i: 0, k, onScreen: false, paused: false };
+  }).filter(Boolean);
+  function slideTo(st, i) {
+    if (i > st.n) { // the jump back was missed (e.g. card hidden mid-slide): restart from the first photo
+      st.track.classList.add("no-anim");
+      st.track.style.transform = "translateX(0)";
+      void st.track.offsetWidth;
+      i = 1;
+    }
+    st.i = i;
+    st.track.classList.remove("no-anim");
+    st.track.style.transform = `translateX(${-100 * i}%)`;
+    st.dots.forEach((d, j) => d.classList.toggle("on", j === i % st.n));
+  }
+  strips.forEach((st) => {
+    // After sliding onto the copy of the first photo, jump back to the real first one unseen.
+    st.track.addEventListener("transitionend", (e) => {
+      if (e.target !== st.track || st.i < st.n) return;
+      st.track.classList.add("no-anim");
+      st.track.style.transform = "translateX(0)";
+      st.i = 0;
+    });
+    const pause = (on) => () => { st.paused = on; };
+    st.el.addEventListener("pointerenter", pause(true));
+    st.el.addEventListener("pointerleave", pause(false));
+    st.el.addEventListener("focusin", pause(true));
+    st.el.addEventListener("focusout", pause(false));
+    // Stagger the cards so they don't all move at once.
+    setTimeout(() => setInterval(() => {
+      if (st.onScreen && !st.paused && !document.hidden && !st.el.hidden) slideTo(st, st.i + 1);
+    }, SLIDE_MS), st.k * 650);
+  });
+  if (strips.length && "IntersectionObserver" in window) {
+    const seen = new IntersectionObserver((entries) => entries.forEach((e) => {
+      const st = strips.find((x) => x.el === e.target);
+      if (st) st.onScreen = e.isIntersecting;
+    }), { threshold: 0.4 });
+    strips.forEach((st) => seen.observe(st.el));
+  } else strips.forEach((st) => { st.onScreen = true; });
 
   /* ---------- Scroll reveal (first appearance only) ---------- */
   let settled = false;
@@ -525,14 +591,20 @@
     try { history.replaceState(null, "", qs ? `?${qs}` : location.pathname); } catch (e) {}
   }
 
+  const VIEW_KEY = "doai-view";
+  try { localStorage.removeItem(VIEW_KEY); } catch (e) {} // older versions remembered the view for good
+  const rememberView = (v) => { try { sessionStorage.setItem(VIEW_KEY, v); } catch (e) {} };
+
   function readUrl() {
     const p = new URLSearchParams(location.search);
     const group = p.get(P), year = p.get("year"), sort = p.get("sort"), view = p.get("view");
     if (group && GROUPS.includes(group)) state.group = group;
     if (year && YEARS.includes(Number(year))) state.year = year;
     if (sort && SORTERS[sort] && cfg.sorts.some(([v]) => v === sort)) state.sort = sort;
+    // A new visit opens in grid view; a switch to list lasts for the rest of the visit
+    // (refreshes and other pages) via sessionStorage, and ?view=list in shared links.
     if (view === "list" || view === "grid") state.view = view;
-    else { try { const v = localStorage.getItem("doai-view"); if (v === "list" || v === "grid") state.view = v; } catch (e) {} }
+    else { try { const v = sessionStorage.getItem(VIEW_KEY); if (v === "list" || v === "grid") state.view = v; } catch (e) {} }
     state.q = p.get("q") || "";
   }
 
@@ -561,7 +633,7 @@
 
   document.querySelectorAll(".seg button").forEach((b) =>
     b.addEventListener("click", () => {
-      try { localStorage.setItem("doai-view", b.dataset.view); } catch (e) {}
+      rememberView(b.dataset.view);
       setState({ view: b.dataset.view });
     })
   );
@@ -650,7 +722,7 @@
     const anchor = [...grid.children].find((el) => !el.hidden && el.getBoundingClientRect().bottom > top + 8); // first card on screen
     const before = anchor ? anchor.getBoundingClientRect().top : 0;
     const view = state.view === "grid" ? "list" : "grid";
-    try { localStorage.setItem("doai-view", view); } catch (e) {}
+    rememberView(view);
     settle();
     setState({ view }, false);
     if (anchor) window.scrollBy({ top: anchor.getBoundingClientRect().top - before, behavior: "instant" });
