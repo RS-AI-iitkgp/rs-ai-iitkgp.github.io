@@ -431,6 +431,21 @@ html.sheet-open { overflow: hidden; }
 /* View transitions (filtering, sorting, layout switch) */
 ::view-transition-group(*) { animation-duration: .45s; animation-timing-function: var(--ease); }
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .25s; }
+/* Keep fixed/sticky chrome above the animating cards, so it never disappears mid-transition. */
+.site-header { view-transition-name: site-header; }
+.toolbar { view-transition-name: toolbar; }
+.search-fab { view-transition-name: search-fab; }
+.view-fab { view-transition-name: view-fab; }
+.to-top { view-transition-name: to-top; }
+::view-transition-group(site-header), ::view-transition-group(toolbar),
+::view-transition-group(search-fab), ::view-transition-group(view-fab), ::view-transition-group(to-top) { z-index: 100; }
+::view-transition-group(site-header) { z-index: 101; }
+
+/* Theme switch: smooth colour fade (no page snapshot) */
+html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
+  transition: background-color .35s ease, color .35s ease, border-color .35s ease,
+              box-shadow .35s ease, fill .35s ease, stroke .35s ease !important;
+}
 
 /* ------------------------------------------------------------------ */
 /* Responsive                                                          */

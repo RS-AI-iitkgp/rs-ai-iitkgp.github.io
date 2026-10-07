@@ -563,11 +563,19 @@
   document.querySelector("[data-clear]").addEventListener("click", clearAll);
 
   /* ---------- Theme ---------- */
+  let themeTimer;
   $("#themeBtn").addEventListener("click", () => {
     const root = document.documentElement;
     const current = root.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
     const next = current === "dark" ? "light" : "dark";
-    withTransition(() => { root.dataset.theme = next; });
+    // Fade colours in place. (A page-snapshot view transition here briefly hid
+    // the sticky header behind the card layers when scrolled mid-list.)
+    if (!reduceMotion) {
+      root.classList.add("theme-anim");
+      clearTimeout(themeTimer);
+      themeTimer = setTimeout(() => root.classList.remove("theme-anim"), 450);
+    }
+    root.dataset.theme = next;
     try { localStorage.setItem("doai-theme", next); } catch (e) {}
   });
 
