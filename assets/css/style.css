@@ -557,6 +557,7 @@ html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
   .footer-inner > :first-child { grid-column: 1 / -1; }
 }
 @media (max-width: 720px) {
+  .footer-base { padding-bottom: calc(96px + env(safe-area-inset-bottom)); } /* room for the floating buttons */
   /* Own stacking layer so dropdowns sit above the cards. */
   .toolbar { position: relative; top: auto; z-index: 25; flex-wrap: wrap; }
   .toolbar.as-sheet {
@@ -637,6 +638,7 @@ html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
   .directory { padding-top: 32px; }
   .directory-head { flex-direction: column; align-items: start; }
   .footer-inner { grid-template-columns: 1fr; gap: 28px; }
+  .footer-base { flex-direction: column; gap: 6px; }
   /* Phone list rows: "Joined" moves under the name so the name and tag get the full width. */
   .grid.is-list .card {
     grid-template-columns: 72px minmax(0, 1fr);
@@ -820,3 +822,11 @@ html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
   .card.reveal { opacity: 1; }
   .hero::before, .hero::after { animation: none !important; }
 }
+
+/* 404 page */
+.hero-404 .hero-inner { min-height: calc(70vh - var(--header-h)); display: flex; flex-direction: column; justify-content: center; }
+.eyebrow-404 { margin: 0 0 14px; font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.nf-links { margin-top: 26px; }
+
+/* Footer: total visits (assets/js/visits.js) */
+.visit-count::before { content: "·"; margin: 0 8px; }
