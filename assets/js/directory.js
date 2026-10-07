@@ -64,7 +64,7 @@
   const YEARS = [...new Set(ITEMS.map((s) => s.year).filter(Boolean))].sort((a, b) => b - a);
 
   const SORTERS = { "year-desc": byYear(-1), "year-asc": byYear(1), "name-asc": byName, "name-desc": (a, b) => -byName(a, b) };
-  const DEFAULT_SORT = YEARS.length ? "year-desc" : "name-asc";
+  const DEFAULT_SORT = SORTERS[cfg.defaultSort] ? cfg.defaultSort : YEARS.length ? "year-desc" : "name-asc";
   const state = { q: "", group: "all", year: "all", sort: DEFAULT_SORT, view: "grid" };
 
   /* ---------- Smart search: typo-tolerant, abbreviation-aware, ranked ---------- */
@@ -172,8 +172,9 @@
 
   /* ---------- Cards ---------- */
   const icon = (id, size = 16) => `<svg width="${size}" height="${size}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
-  const linkIcon = (href, id, label, name) =>
-    href ? `<a href="${esc(href)}" ${href.startsWith("#") ? "" : 'target="_blank" rel="noopener"'} title="${label}" aria-label="${label} — ${esc(name)}">${icon(id)}</a>` : "";
+  // data-tip / data-email feed the hover popup (see "Link popups" below).
+  const linkIcon = (href, id, label, name, email = "") =>
+    href ? `<a href="${esc(href)}" ${href.startsWith("#") ? "" : 'target="_blank" rel="noopener"'} data-tip="${label}"${email ? ` data-email="${esc(email)}"` : ""} aria-label="${label} — ${esc(name)}">${icon(id)}</a>` : "";
 
   // "Dr. Name", linked to the homepage in data/supervisors.js when known.
   const SUP_SITES = window.SUPERVISORS || {};
@@ -213,7 +214,7 @@
     const sups = s.supervisors;
     const text = alumni ? s.thesis : s.topic;
     const links = [
-      s.email ? linkIcon(`mailto:${s.email}`, "mail", "Email", s.name) : "",
+      s.email ? linkIcon(`mailto:${s.email}`, "mail", "Email", s.name, s.email) : "",
       linkIcon(safeUrl(s.linkedin), "linkedin", "LinkedIn", s.name),
       linkIcon(safeUrl(s.website), "globe", "Website", s.name),
       linkIcon(safeUrl(s.scholar), "scholar", "Google Scholar", s.name),
@@ -444,6 +445,7 @@
   }
 
   function update() {
+    hideTip();
     runSearch();
     const sorter = SORTERS[state.sort] || SORTERS[DEFAULT_SORT];
     // While searching, best matches come first; the chosen sort breaks ties.
@@ -713,6 +715,89 @@
   });
   const batchLabel = $("#batchLabel");
   if (batchLabel && YEARS.length > 1) batchLabel.textContent += ` · ${YEARS[YEARS.length - 1]}–${YEARS[0]}`;
+
+  /* ---------- Link popups ---------- */
+  // One floating popup (cards clip overflow) naming the hovered link; for email it shows the
+  // address with a copy button, and stays open while the pointer moves onto it.
+  const COPY_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V6A2.5 2.5 0 0 0 13 3.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5"/></g></svg>';
+  const CHECK_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+  const tip = document.createElement("div");
+  tip.className = "link-tip";
+  tip.id = "linkTip";
+  tip.setAttribute("role", "tooltip");
+  document.body.appendChild(tip);
+  let tipFor = null, tipTimer = 0, copiedTimer = 0;
+
+  function showTip(a) {
+    clearTimeout(tipTimer);
+    if (tipFor === a) return;
+    if (tipFor) tipFor.removeAttribute("aria-describedby");
+    tipFor = a;
+    const email = a.dataset.email;
+    tip.classList.toggle("is-email", !!email);
+    tip.innerHTML = email
+      ? `<span class="lt-text">${esc(email)}</span><button class="lt-copy" type="button" aria-label="Copy email address" title="Copy">${COPY_SVG}</button>`
+      : `<span class="lt-text">${esc(a.dataset.tip)}</span>`;
+    a.setAttribute("aria-describedby", tip.id);
+    // Centre above the link, kept inside the viewport; flip below when it would hide under the header.
+    const r = a.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+    const left = Math.max(8, Math.min(r.left + r.width / 2 - w / 2, innerWidth - w - 8));
+    const below = r.top - h - 10 < 72;
+    tip.classList.toggle("is-below", below);
+    tip.style.left = `${left}px`;
+    tip.style.top = `${below ? r.bottom + 10 : r.top - h - 10}px`;
+    tip.style.setProperty("--arrow-x", `${r.left + r.width / 2 - left}px`);
+    tip.classList.add("show");
+  }
+  function hideTip() {
+    clearTimeout(tipTimer);
+    if (!tipFor) return;
+    tipFor.removeAttribute("aria-describedby");
+    tipFor = null;
+    tip.classList.remove("show");
+  }
+  const hideTipSoon = () => { clearTimeout(tipTimer); tipTimer = setTimeout(hideTip, 160); };
+  const tipLink = (el) => el && el.closest && el.closest(".c-links a[data-tip]");
+
+  grid.addEventListener("pointerover", (e) => { const a = tipLink(e.target); if (a && e.pointerType !== "touch") showTip(a); });
+  grid.addEventListener("pointerout", (e) => { const a = tipLink(e.target); if (a && !a.contains(e.relatedTarget)) hideTipSoon(); });
+  grid.addEventListener("focusin", (e) => { const a = tipLink(e.target); if (a) showTip(a); });
+  grid.addEventListener("focusout", (e) => { if (tipLink(e.target) && !tip.contains(e.relatedTarget)) hideTipSoon(); });
+  tip.addEventListener("pointerenter", () => clearTimeout(tipTimer));
+  tip.addEventListener("pointerleave", hideTipSoon);
+  tip.addEventListener("focusout", (e) => { if (!tip.contains(e.relatedTarget) && e.relatedTarget !== tipFor) hideTipSoon(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && tipFor) { const a = tipFor; hideTip(); if (tip.contains(document.activeElement)) a.focus(); } });
+  window.addEventListener("scroll", hideTip, { passive: true });
+  window.addEventListener("resize", hideTip);
+
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    const ta = Object.assign(document.createElement("textarea"), { value: text });
+    ta.style.cssText = "position:fixed;opacity:0";
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand("copy");
+    ta.remove();
+    return ok ? Promise.resolve() : Promise.reject(new Error("copy failed"));
+  }
+  tip.addEventListener("click", (e) => {
+    const btn = e.target.closest(".lt-copy");
+    if (!btn || !tipFor) return;
+    copyText(tipFor.dataset.email).then(() => {
+      btn.innerHTML = CHECK_SVG;
+      btn.classList.add("copied");
+      btn.setAttribute("aria-label", "Copied");
+      btn.title = "Copied";
+      clearTimeout(copiedTimer);
+      copiedTimer = setTimeout(() => {
+        if (!btn.isConnected) return;
+        btn.innerHTML = COPY_SVG;
+        btn.classList.remove("copied");
+        btn.setAttribute("aria-label", "Copy email address");
+        btn.title = "Copy";
+      }, 1600);
+    }).catch(() => {});
+  });
 
   /* ---------- Footer ---------- */
   $("#yearNow").textContent = new Date().getFullYear();

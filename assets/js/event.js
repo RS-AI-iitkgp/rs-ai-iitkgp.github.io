@@ -81,9 +81,21 @@
   }
 
   /* ---------- Full-screen photo viewer ---------- */
+  // Extras: slideshow (Space), thumbnail panel on the right (G; bottom strip on phones), browser full screen (F).
   function setupLightbox(photos) {
     const lb = $("#lightbox"), img = $("#lbImg"), cap = $("#lbCap"), count = $("#lbCount");
-    let index = 0, lastFocus = null;
+    const panel = $("#lbPanel"), progress = $(".lb-progress", lb);
+    const playBtn = $(".lb-play", lb), panelBtn = $(".lb-panel-btn", lb), fsBtn = $(".lb-fs", lb);
+    const SLIDE_MS = 4000, PANEL_KEY = "doai-lb-panel";
+    let index = 0, lastFocus = null, playing = false, slideTimer = 0;
+
+    panel.innerHTML = photos.map((p, i) => `
+      <button class="lb-thumb" type="button" data-i="${i}" aria-label="Photo ${i + 1}${p.caption ? `: ${esc(p.caption)}` : ""}">
+        <img src="${esc(safeUrl(p.src))}" alt="" loading="lazy" decoding="async">
+      </button>`).join("");
+    const thumbs = [...panel.querySelectorAll(".lb-thumb")];
+    const panelOpen = () => lb.classList.contains("panel-open");
+    const revealThumb = (smooth) => thumbs[index].scrollIntoView({ block: "nearest", inline: "nearest", behavior: smooth && !reduceMotion ? "smooth" : "auto" });
 
     function show(i) {
       index = (i + photos.length) % photos.length;
@@ -95,18 +107,74 @@
       cap.textContent = p.caption || "";
       cap.hidden = !p.caption;
       count.textContent = `${index + 1} / ${photos.length}`;
+      thumbs.forEach((t, k) => (k === index ? t.setAttribute("aria-current", "true") : t.removeAttribute("aria-current")));
+      if (panelOpen()) revealThumb(true);
+      if (playing) schedule(); // any move restarts the slideshow countdown
       // Preload neighbours for instant next/previous.
       [index + 1, index - 1].forEach((j) => { const n = photos[(j + photos.length) % photos.length]; if (n) new Image().src = safeUrl(n.src); });
     }
+
+    /* Slideshow */
+    function schedule() {
+      clearTimeout(slideTimer);
+      progress.classList.remove("run");
+      void progress.offsetWidth; // restart the progress bar animation
+      progress.classList.add("run");
+      slideTimer = setTimeout(() => show(index + 1), SLIDE_MS);
+    }
+    function setPlaying(on) {
+      playing = on && photos.length > 1;
+      lb.classList.toggle("playing", playing);
+      playBtn.setAttribute("aria-pressed", String(playing));
+      playBtn.setAttribute("aria-label", playing ? "Pause slideshow" : "Start slideshow");
+      clearTimeout(slideTimer);
+      progress.classList.remove("run");
+      if (playing) schedule();
+    }
+    progress.style.setProperty("--slide", `${SLIDE_MS}ms`);
+
+    /* Gallery panel (remembered between visits) */
+    function setPanel(on) {
+      lb.classList.toggle("panel-open", on);
+      panel.inert = !on;
+      panelBtn.setAttribute("aria-pressed", String(on));
+      panelBtn.setAttribute("aria-label", on ? "Hide gallery panel" : "Show gallery panel");
+      try { localStorage.setItem(PANEL_KEY, on ? "1" : "0"); } catch (e) {}
+      if (on) revealThumb(false);
+    }
+
+    /* Browser full screen (button hidden where unsupported, e.g. iPhone Safari) */
+    const fsElement = () => document.fullscreenElement || document.webkitFullscreenElement;
+    if (!(document.fullscreenEnabled || document.webkitFullscreenEnabled)) fsBtn.hidden = true;
+    function exitFs() { if (fsElement()) (document.exitFullscreen || document.webkitExitFullscreen).call(document); }
+    function toggleFs() {
+      if (fsElement()) return exitFs();
+      const req = lb.requestFullscreen || lb.webkitRequestFullscreen;
+      if (req) Promise.resolve(req.call(lb)).catch(() => {});
+    }
+    function onFsChange() {
+      const on = fsElement() === lb;
+      lb.classList.toggle("is-fs", on);
+      fsBtn.setAttribute("aria-pressed", String(on));
+      fsBtn.setAttribute("aria-label", on ? "Exit full screen" : "Full screen");
+    }
+    document.addEventListener("fullscreenchange", onFsChange);
+    document.addEventListener("webkitfullscreenchange", onFsChange);
+
     function open(i) {
       lastFocus = document.activeElement;
+      let pref = false;
+      try { pref = localStorage.getItem(PANEL_KEY) === "1"; } catch (e) {}
+      setPanel(pref);
       show(i);
       lb.hidden = false;
       document.documentElement.classList.add("sheet-open");
-      requestAnimationFrame(() => lb.classList.add("show"));
+      requestAnimationFrame(() => { lb.classList.add("show"); if (panelOpen()) revealThumb(false); });
       $(".lb-close", lb).focus();
     }
     function close() {
+      setPlaying(false);
+      exitFs();
       lb.classList.remove("show");
       document.documentElement.classList.remove("sheet-open");
       setTimeout(() => { lb.hidden = true; img.removeAttribute("src"); }, reduceMotion ? 0 : 220);
@@ -120,29 +188,39 @@
     $(".lb-close", lb).addEventListener("click", close);
     $(".lb-prev", lb).addEventListener("click", () => show(index - 1));
     $(".lb-next", lb).addEventListener("click", () => show(index + 1));
+    playBtn.addEventListener("click", () => setPlaying(!playing));
+    panelBtn.addEventListener("click", () => setPanel(!panelOpen()));
+    fsBtn.addEventListener("click", toggleFs);
+    panel.addEventListener("click", (e) => { const t = e.target.closest(".lb-thumb"); if (t) show(Number(t.dataset.i)); });
     lb.addEventListener("click", (e) => { if (e.target === lb || e.target.classList.contains("lb-stage")) close(); });
     document.addEventListener("keydown", (e) => {
-      if (lb.hidden) return;
-      if (e.key === "Escape") close();
+      if (lb.hidden || e.ctrlKey || e.metaKey || e.altKey) return;
+      const k = e.key.toLowerCase();
+      if (e.key === "Escape") { if (!fsElement()) close(); } // in full screen, Esc only leaves full screen
       else if (e.key === "ArrowRight") show(index + 1);
       else if (e.key === "ArrowLeft") show(index - 1);
+      else if (e.key === " ") { e.preventDefault(); setPlaying(!playing); }
+      else if (k === "g") setPanel(!panelOpen());
+      else if (k === "f" && !fsBtn.hidden) toggleFs();
       else if (e.key === "Tab") { // keep focus inside the viewer
-        const f = [...lb.querySelectorAll("button")];
-        const k = f.indexOf(document.activeElement);
+        const f = [...lb.querySelectorAll("button")].filter((b) => !b.closest("[inert]") && b.offsetParent !== null);
+        const at = f.indexOf(document.activeElement);
         e.preventDefault();
-        f[(k + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+        f[(at + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
       }
     });
-    // Swipe on touch screens.
+    // Space toggles the slideshow, so it mustn't also press the focused button.
+    document.addEventListener("keyup", (e) => { if (!lb.hidden && e.key === " ") e.preventDefault(); });
+    // Swipe on touch screens (not on the thumbnail strip, which scrolls).
     let x0 = null;
-    lb.addEventListener("touchstart", (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+    lb.addEventListener("touchstart", (e) => { x0 = e.target.closest(".lb-panel") ? null : e.touches[0].clientX; }, { passive: true });
     lb.addEventListener("touchend", (e) => {
       if (x0 == null) return;
       const dx = e.changedTouches[0].clientX - x0;
       if (Math.abs(dx) > 50) show(index + (dx < 0 ? 1 : -1));
       x0 = null;
     });
-    if (photos.length < 2) lb.classList.add("single");
+    if (photos.length < 2) { lb.classList.add("single"); playBtn.hidden = true; }
   }
 
   /* ---------- Shared page chrome: theme, header, back-to-top, footer ---------- */

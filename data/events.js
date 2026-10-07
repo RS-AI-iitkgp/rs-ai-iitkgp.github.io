@@ -34,12 +34,31 @@ window.EVENTS = [
     details: [], photos: [] },
 
   // ---- Teachers' Day ----
-  { id: "teachers-day-2026", title: "Teachers' Day Celebration 2026", date: "Sep 2026", category: "Celebration", venue: "Department of AI, IIT Kharagpur",
+  { id: "teachers-day-2026", title: "Teachers' Day Celebration 2026", date: "7 Sep 2026", category: "Celebration", venue: "Department of AI, IIT Kharagpur",
     summary: "The PhD scholars of the department celebrated Teachers' Day to thank their supervisors and faculty mentors.", links: [],
-    details: [], photos: [] },
-  { id: "teachers-day-2025", title: "Teachers' Day Celebration 2025", date: "Sep 2025", category: "Celebration", venue: "Department of AI, IIT Kharagpur",
+    details: [], photos: [
+      { src: "images/events/teachers-day-2026/01.jpg", caption: "The decorated venue" },
+      { src: "images/events/teachers-day-2026/02.jpg", caption: "Faculty and scholars at the celebration" },
+      { src: "images/events/teachers-day-2026/03.jpg", caption: "Cutting the cake" },
+      { src: "images/events/teachers-day-2026/04.jpg", caption: "Faculty members cut the cake" },
+      { src: "images/events/teachers-day-2026/05.jpg", caption: "Group photo" },
+    ] },
+  { id: "teachers-day-2025", title: "Teachers' Day Celebration 2025", date: "8 Sep 2025", category: "Celebration", venue: "Department of AI, IIT Kharagpur",
     summary: "The PhD scholars of the department organised a Teachers' Day celebration to thank their supervisors and faculty mentors, with personalised cards and tokens of appreciation.", links: [],
-    details: [], photos: [] },
+    details: [], photos: [
+      { src: "images/events/teachers-day-2025/01.jpg", caption: "The Department of AI inauguration plaque" },
+      { src: "images/events/teachers-day-2025/02.jpg", caption: "Faculty members at the celebration" },
+      { src: "images/events/teachers-day-2025/03.jpg", caption: "Lighting the lamp" },
+      { src: "images/events/teachers-day-2025/04.jpg", caption: "Scholars gather for the celebration" },
+      { src: "images/events/teachers-day-2025/05.jpg", caption: "The Teachers' Day cake" },
+      { src: "images/events/teachers-day-2025/06.jpg", caption: "Faculty and scholars together" },
+      { src: "images/events/teachers-day-2025/07.jpg", caption: "Faculty members cut the cake" },
+      { src: "images/events/teachers-day-2025/08.jpg", caption: "Cutting the cake" },
+      { src: "images/events/teachers-day-2025/09.jpg", caption: "Group photo" },
+      { src: "images/events/teachers-day-2025/10.jpg", caption: "Group photo" },
+      { src: "images/events/teachers-day-2025/11.jpg", caption: "Group photo" },
+      { src: "images/events/teachers-day-2025/12.jpg", caption: "Group photo" },
+    ] },
 
   // ---- IdoAI talk series ----
   { title: "IdoAI — Interdisciplinary Opportunities with AI", date: "21 Jul 2025", category: "IdoAI Talk Series", venue: "CRR Building, IIT Kharagpur",

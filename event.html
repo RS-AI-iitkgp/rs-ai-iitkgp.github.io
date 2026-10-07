@@ -37,6 +37,11 @@
     <symbol id="i-close" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></symbol>
     <symbol id="i-calendar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke-linecap="round"/></g></symbol>
     <symbol id="i-image" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-5-5-8.5 8.5"/></g></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5.6v12.8c0 .8.9 1.3 1.6.8l9.6-6.4a1 1 0 0 0 0-1.6L9.6 4.8C8.9 4.3 8 4.8 8 5.6Z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><g fill="currentColor"><rect x="6.5" y="5" width="4" height="14" rx="1.2"/><rect x="13.5" y="5" width="4" height="14" rx="1.2"/></g></symbol>
+    <symbol id="i-panel" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="M14.5 4.5v15"/></g><g fill="currentColor"><rect x="16.3" y="7.5" width="2.6" height="2.6" rx=".6"/><rect x="16.3" y="11.2" width="2.6" height="2.6" rx=".6"/><rect x="16.3" y="14.9" width="2.6" height="2.6" rx=".6"/></g></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15"/></symbol>
+    <symbol id="i-shrink" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M9 4v3.5A1.5 1.5 0 0 1 7.5 9H4M20 9h-3.5A1.5 1.5 0 0 1 15 7.5V4M15 20v-3.5a1.5 1.5 0 0 1 1.5-1.5H20M4 15h3.5A1.5 1.5 0 0 1 9 16.5V20"/></symbol>
     <symbol id="i-arrow-up" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 19V5M6 11l6-6 6 6"/></symbol>
     <symbol id="i-empty" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="21" cy="21" r="13"/><path d="m31 31 9 9M16 21h10"/></g></symbol>
   </svg>
@@ -96,6 +101,8 @@
           <li><a href="alumni.html">Alumni</a></li>
           <li><a href="events.html">Events</a></li>
           <li><a href="https://ai.iitkgp.ac.in" target="_blank" rel="noopener">Department website</a></li>
+          <li><a href="https://ai.iitkgp.ac.in/pages/people/faculty.html" target="_blank" rel="noopener">Faculty</a></li>
+          <li><a href="https://idoai-iitkgp.github.io/" target="_blank" rel="noopener">IdoAI talk series</a></li>
           <li><a href="https://www.iitkgp.ac.in" target="_blank" rel="noopener">IIT Kharagpur</a></li>
         </ul>
       </div>
@@ -114,10 +121,17 @@
     <div class="lb-stage">
       <figure class="lb-figure"><img id="lbImg" alt="" /><figcaption id="lbCap" hidden></figcaption></figure>
     </div>
-    <button class="lb-btn lb-close" type="button" aria-label="Close"><svg width="22" height="22" aria-hidden="true"><use href="#i-close"/></svg></button>
+    <div class="lb-tools">
+      <button class="lb-btn lb-play" type="button" aria-label="Start slideshow" aria-pressed="false" title="Slideshow (Space)"><svg class="when-off" width="20" height="20" aria-hidden="true"><use href="#i-play"/></svg><svg class="when-on" width="20" height="20" aria-hidden="true"><use href="#i-pause"/></svg></button>
+      <button class="lb-btn lb-panel-btn" type="button" aria-label="Show gallery panel" aria-pressed="false" aria-controls="lbPanel" title="Gallery panel (G)"><svg width="21" height="21" aria-hidden="true"><use href="#i-panel"/></svg></button>
+      <button class="lb-btn lb-fs" type="button" aria-label="Full screen" aria-pressed="false" title="Full screen (F)"><svg class="when-off" width="20" height="20" aria-hidden="true"><use href="#i-expand"/></svg><svg class="when-on" width="20" height="20" aria-hidden="true"><use href="#i-shrink"/></svg></button>
+      <button class="lb-btn lb-close" type="button" aria-label="Close" title="Close (Esc)"><svg width="22" height="22" aria-hidden="true"><use href="#i-close"/></svg></button>
+    </div>
     <button class="lb-btn lb-prev" type="button" aria-label="Previous photo"><svg width="24" height="24" aria-hidden="true"><use href="#i-arrow-left"/></svg></button>
     <button class="lb-btn lb-next" type="button" aria-label="Next photo"><svg width="24" height="24" aria-hidden="true"><use href="#i-arrow-right"/></svg></button>
     <span class="lb-count" id="lbCount"></span>
+    <span class="lb-progress" aria-hidden="true"></span>
+    <aside class="lb-panel" id="lbPanel" aria-label="All photos" inert></aside>
   </div>
 
   <!-- Event data lives in data/events.js — edit that file, not this page. -->
