@@ -86,8 +86,7 @@ svg { display: block; flex-shrink: 0; }
 .site-header.scrolled { border-bottom-color: var(--line); }
 .header-inner { height: 100%; display: flex; align-items: center; gap: 28px; }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; min-width: 0; margin-right: auto; }
-.brand-logo { width: 44px; height: 44px; flex-shrink: 0; object-fit: contain; transition: transform .4s var(--ease); }
-.brand:hover .brand-logo { transform: rotate(-6deg) scale(1.04); }
+.brand-logo { width: 44px; height: 44px; flex-shrink: 0; object-fit: contain; }
 .logo-dark { display: none; }
 :root[data-theme="dark"] .logo-light { display: none; }
 :root[data-theme="dark"] .logo-dark { display: block; }
