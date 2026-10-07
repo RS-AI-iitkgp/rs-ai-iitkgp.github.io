@@ -3,6 +3,7 @@
 A static website listing the department's current PhD scholars and alumni.
 
 **Live site:** https://phdscholars-ai.github.io
+
 It has no build step and no dependencies: plain HTML, CSS and JavaScript.
 
 ## Pages
