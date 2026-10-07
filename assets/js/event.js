@@ -55,13 +55,14 @@
         ${ev.summary ? `<p>${esc(ev.summary)}</p>` : ""}
         ${[].concat(ev.details || []).filter(Boolean).map((p) => `<p>${esc(p)}</p>`).join("")}
       </div>
-      ${links.length ? `<div class="ev-links enter" style="--i:3">${links.map((l) => `<a class="c-pill" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${esc(l.label || "Link")} <span aria-hidden="true">↗</span></a>`).join("")}</div>` : ""}`;
+      ${links.length ? `<div class="ev-links enter" style="--i:3">${links.map((l) => `<a class="c-pill" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${esc(l.label || "Link")} <svg class="pill-arrow is-ext" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M7 17 17 7M9 7h8v8"/></svg></a>`).join("")}</div>` : ""}`;
 
     const photos = [].concat(ev.photos || [])
       .map((p) => (typeof p === "string" ? { src: p } : p))
       .filter((p) => p && safeUrl(p.src))
       // Small copy for tiles and the panel: images/events/<id>/thumbs/<same name> unless `thumb` is given.
-      .map((p) => ({ ...p, src: safeUrl(p.src), thumb: safeUrl(p.thumb) || safeUrl(p.src).replace(/([^/]+)$/, "thumbs/$1") }));
+      .map((p) => ({ ...p, src: safeUrl(p.src), thumb: safeUrl(p.thumb) || safeUrl(p.src).replace(/([^/]+)$/, "thumbs/$1"),
+        ar: Number(p.ar) > 0.2 && Number(p.ar) < 6 ? Number(p.ar) : 0 }));
 
     main.innerHTML = `
       <div class="directory-head">
@@ -69,10 +70,12 @@
         <p class="results">${photos.length ? `<span><b>${photos.length}</b> ${photos.length === 1 ? "photo" : "photos"}</span>` : "<span>Coming soon</span>"}</p>
       </div>
       ${photos.length
+        // Justified rows, like Google Photos: each tile keeps its photo's shape (--ar = width / height).
+        // Without `ar` in the data the tile starts at 3:2 and takes the real shape once the photo loads.
         ? `<div class="gallery">${photos.map((p, i) => `
-            <button class="g-item" type="button" data-i="${i}" aria-label="Open photo ${i + 1} of ${photos.length}${p.caption ? `: ${esc(p.caption)}` : ""}">
+            <button class="g-item" type="button" data-i="${i}" style="--ar: ${p.ar || 1.5}"${p.ar ? "" : " data-measure"} aria-label="Open photo ${i + 1} of ${photos.length}${p.caption ? `: ${esc(p.caption)}` : ""}">
               <img src="${esc(p.thumb)}" data-full="${esc(p.src)}" alt="${esc(p.caption || `${ev.title} — photo ${i + 1}`)}" loading="lazy" decoding="async"
-                   onload="this.classList.add('loaded')" onerror="if (this.dataset.full) { this.src = this.dataset.full; this.removeAttribute('data-full'); } else this.closest('.g-item').classList.add('broken');">
+                   onload="this.classList.add('loaded'); var t = this.closest('.g-item'); if (t.hasAttribute('data-measure')) t.style.setProperty('--ar', (this.naturalWidth / this.naturalHeight).toFixed(3));"onerror="if (this.dataset.full) { this.src = this.dataset.full; this.removeAttribute('data-full'); } else this.closest('.g-item').classList.add('broken');">
               ${p.caption ? `<span class="g-cap">${esc(p.caption)}</span>` : ""}
             </button>`).join("")}</div>`
         : `<div class="gallery is-empty" aria-label="Photos coming soon">${Array.from({ length: 6 }, (_, i) => `

@@ -195,15 +195,17 @@
       : esc(label);
   }
 
+  // Arrow icons for link pills (same stroke as the page's "See our …" arrows); diagonal for links that leave the site.
+  const pillArrow = (external) => `<svg class="pill-arrow${external ? " is-ext" : ""}" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="${external ? "M7 17 17 7M9 7h8v8" : "M5 12h14M13 6l6 6-6 6"}"/></svg>`;
   function eventCardHTML(s) {
     const big = s.day ? s.day : s.year && s.month !== null && /[a-z]/i.test(s.yearLabel) ? MONTHS[s.month] : s.year ? s.year : "TBA";
     const small = s.day ? `${MONTHS[s.month]} ${s.year}` : s.year && /[a-z]/i.test(s.yearLabel) ? s.year : "";
     const meta = [s.speaker && `<b>${esc(s.speaker)}</b>${s.affiliation ? `, ${esc(s.affiliation)}` : ""}`, s.venue && esc(s.venue)]
       .filter(Boolean).join(" · ");
     const detail = s.id ? `event.html?id=${encodeURIComponent(s.id)}` : "";
-    const pills = (detail ? `<a class="c-pill c-pill-main" href="${detail}">Photos &amp; details <span aria-hidden="true">→</span></a>` : "") + s.links.map((l) => {
+    const pills = (detail ? `<a class="c-pill c-pill-main" href="${detail}">Photos &amp; details ${pillArrow(false)}</a>` : "") + s.links.map((l) => {
       const href = safeUrl(l.url);
-      return href ? `<a class="c-pill" href="${esc(href)}" ${href.startsWith("#") ? "" : 'target="_blank" rel="noopener"'}>${esc(l.label || "Link")} <span aria-hidden="true">↗</span></a>` : "";
+      return href ? `<a class="c-pill" href="${esc(href)}" ${href.startsWith("#") ? "" : 'target="_blank" rel="noopener"'}>${esc(l.label || "Link")} ${pillArrow(!href.startsWith("#"))}</a>` : "";
     }).join("");
     // Highlight photos (a copy of the first at the end lets the strip loop seamlessly).
     const hl = s.highlights;
