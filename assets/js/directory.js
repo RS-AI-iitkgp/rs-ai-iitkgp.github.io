@@ -687,21 +687,34 @@
   }
 
   /* ---------- Hero numbers ---------- */
-  function countUp(el, to) {
-    if (reduceMotion) { el.textContent = to; return; }
-    const start = performance.now(), dur = 1100;
-    const tick = (t) => {
-      const k = Math.min(1, (t - start) / dur);
-      el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3)));
-      if (k < 1) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
+  // Odometer: each digit spins on its own reel and settles on its value.
+  function rollTo(el, to) {
+    const digits = String(to).split("");
+    el.textContent = "";
+    el.insertAdjacentHTML("beforeend", `<span class="sr-only">${to}</span>`);
+    if (reduceMotion) { el.insertAdjacentHTML("beforeend", `<span aria-hidden="true">${to}</span>`); return; }
+    const reel = Array.from({ length: 20 }, (_, n) => `<span>${n % 10}</span>`).join("");
+    const strips = digits.map((d) => {
+      const col = document.createElement("span");
+      col.className = "odo-col";
+      col.setAttribute("aria-hidden", "true");
+      col.innerHTML = `<span class="odo-strip">${reel}</span>`;
+      el.appendChild(col);
+      return [col.firstChild, Number(d)];
+    });
+    // Two frames so the start position is painted before the spin begins.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      strips.forEach(([strip, d], i) => {
+        strip.style.transitionDelay = `${250 + i * 110}ms`;
+        strip.style.transform = `translateY(-${(10 + d) * 5}%)`; // second lap: a full spin, then land
+      });
+    }));
   }
   const stats = cfg.stats({ items: ITEMS, groups: GROUPS.filter((g) => g !== NONE), years: YEARS });
   document.querySelectorAll("[data-count]").forEach((el) => {
     const v = stats[el.dataset.count];
     if (v == null) el.closest("li").hidden = true;
-    else countUp(el, v);
+    else rollTo(el, v);
   });
   const batchLabel = $("#batchLabel");
   if (batchLabel && YEARS.length > 1) batchLabel.textContent += ` · ${YEARS[YEARS.length - 1]}–${YEARS[0]}`;
