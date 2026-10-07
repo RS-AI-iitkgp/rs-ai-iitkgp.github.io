@@ -18,6 +18,7 @@ Expected file names
 -------------------
 aaryama-shree.jpg
 abhishek-kumar.jpg
+ahon-bandyopadhyay.jpg
 aman-kumar.jpg
 amrita-garai.jpg
 animesh.jpg

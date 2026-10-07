@@ -302,6 +302,11 @@ kbd {
 .c-joined b { font-weight: 600; color: var(--ink); }
 .c-id { grid-area: id; margin-top: 20px; min-width: 0; }
 .c-name { margin: 0; font: 600 21px/1.25 var(--display); letter-spacing: -.01em; }
+.c-prog {
+  display: inline-block; margin: 6px 0 0; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  color: var(--accent); background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.grid.is-list .c-prog { margin-top: 3px; }
 .c-pos { display: flex; gap: 7px; margin: 6px 0 0; font-size: 14px; line-height: 1.45; color: var(--ink-2); }
 .c-pos svg { margin-top: 2px; color: var(--area); }
 .c-pos b { font-weight: 600; color: var(--ink); }

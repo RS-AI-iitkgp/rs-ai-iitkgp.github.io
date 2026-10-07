@@ -48,6 +48,11 @@
       s.links = [].concat(s.links || []).filter((l) => l && l.url);
     } else {
       s.supervisors = (Array.isArray(s.supervisors) ? s.supervisors : [s.supervisors]).filter(Boolean);
+      if (cfg.kind === "scholar") {
+        // "MS" → "MS by Research"; any other text is shown as-is (e.g. "PhD · Working Professional"); default "PhD".
+        const prog = String(s.program || "").trim();
+        s.programLabel = /^ms\b/i.test(prog) ? "MS by Research" : prog || "PhD";
+      }
     }
     return s;
   });
@@ -63,7 +68,7 @@
   const state = { q: "", group: "all", year: "all", sort: DEFAULT_SORT, view: "grid" };
 
   /* ---------- Smart search: typo-tolerant, abbreviation-aware, ranked ---------- */
-  const STOP = new Set(["a", "an", "and", "at", "by", "for", "in", "of", "on", "the", "to", "with", "prof", "dr", "mr", "ms", "mrs"]);
+  const STOP = new Set(["a", "an", "and", "at", "by", "for", "in", "of", "on", "the", "to", "with", "prof", "dr", "mr", "mrs"]);
   const PLACEHOLDER = /^(yyyy|prof\.? supervisor name|prof\.? co-supervisor name|current position|organisation name|phd thesis title goes here)$/i;
   const norm = (t) => String(t ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
   const words = (t) => norm(t).split(" ").filter((w) => w && !STOP.has(w));
@@ -114,6 +119,7 @@
       });
     };
     field(s.name, 3);
+    field(s.programLabel, 1.2);
     field(s.supervisors, 2);
     field(s.position, 1.6, true);
     field(s.organisation, 1.6, true);
@@ -221,6 +227,7 @@
       ${s.yearLabel ? `<span class="c-joined">${esc(cfg.year.label)} <b>${esc(s.yearLabel)}</b></span>` : ""}
       <div class="c-id">
         <h3 class="c-name">${esc(s.name)}</h3>
+        ${s.programLabel && s.programLabel !== "PhD" ? `<p class="c-prog">${esc(s.programLabel)}</p>` : ""}
         ${position}
       </div>
       <p class="c-topic">${text ? `${alumni ? '<span class="c-label">Thesis</span>' : ""}${esc(text)}` : ""}</p>
