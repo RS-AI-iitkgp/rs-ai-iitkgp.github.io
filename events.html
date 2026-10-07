@@ -69,8 +69,7 @@
         </p>
         <ul class="stats enter" style="--i:2">
           <li><strong data-count="total">0</strong><span>Events</span></li>
-          <li><strong data-count="talks">0</strong><span>Talks</span></li>
-          <li><strong data-count="speakers">0</strong><span>Scholar speakers</span></li>
+          <li><strong data-count="groups">0</strong><span>Categories</span></li>
         </ul>
       </div>
     </section>
@@ -187,11 +186,7 @@
         ["year-asc", "Oldest first"],
         ["name-asc", "Title: A–Z"],
       ],
-      stats: ({ items, years }) => ({
-        total: items.length,
-        talks: items.filter((e) => /talk|seminar/i.test(e.category || "")).length || null,
-        speakers: new Set(items.filter((e) => /scholar/i.test(e.affiliation || "")).map((e) => e.speaker)).size || null,
-      }),
+      stats: ({ items, groups }) => ({ total: items.length, groups: groups.length }),
       lastUpdated: "October 2026",
     };
   </script>
