@@ -549,6 +549,20 @@ html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
   .brand-text { display: none; } /* logo only, so four nav links fit */
 }
 
+/* Event rows in list view: date · title/venue · summary · category (no links) */
+.grid.is-list .card.is-event {
+  grid-template-columns: 72px minmax(200px, 1.1fr) minmax(0, 2fr) max-content;
+  grid-template-areas: "mono id topic joined";
+}
+.grid.is-list .card.is-event .c-links { display: none; }
+@media (max-width: 1020px) {
+  .grid.is-list .card.is-event { grid-template-columns: 72px minmax(0, 1fr) max-content; grid-template-areas: "mono id joined" ". topic topic"; }
+}
+@media (max-width: 720px) {
+  .grid.is-list .card.is-event { grid-template-columns: 60px minmax(0, 1fr); grid-template-areas: "mono id" "mono joined"; row-gap: 6px; }
+  .grid.is-list .card.is-event .c-joined { justify-self: start; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0ms !important; transition-duration: .01ms !important; }

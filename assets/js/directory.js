@@ -120,7 +120,6 @@
     field(s.group, 1.4, true);
     field(s.topic, 1.4, true);
     field(s.thesis, 1.4, true);
-    field(s.people, 2);
     field(s.speaker, 2);
     field(s.affiliation, 1.4, true);
     field(s.summary, 1.2, true);
@@ -198,7 +197,6 @@
         ${meta ? `<p class="c-pos">${icon(s.speaker ? "mic" : "pin", 15)}<span>${meta}</span></p>` : ""}
       </div>
       <p class="c-topic">${esc(s.summary || "")}</p>
-      ${s.people.length ? `<div class="c-sup"><span class="c-label">${esc(s.peopleLabel || "People")}</span>${s.people.map(esc).join(", ")}</div>` : ""}
       <div class="c-links">${pills}</div>`;
   }
 
@@ -232,7 +230,7 @@
   const grid = $("#grid");
   const cards = ITEMS.map((s, i) => {
     const el = document.createElement("article");
-    el.className = "card reveal" + (s.supervisors.length || (s.people && s.people.length) ? "" : " no-sup") + (cfg.kind === "event" ? " is-event" : "");
+    el.className = "card reveal" + (s.supervisors.length ? "" : " no-sup") + (cfg.kind === "event" ? " is-event" : "");
     el.style.setProperty("--area", HUE.get(s.group));
     el.style.viewTransitionName = `${cfg.kind}-${i}`;
     el.innerHTML = cardHTML(s);
