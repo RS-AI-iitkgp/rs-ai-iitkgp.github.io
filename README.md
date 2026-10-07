@@ -2,7 +2,7 @@
 
 A static website listing the department's current PhD scholars and alumni.
 
-**Live site:** https://phdscholars-ai.github.io
+**Live site:** https://rs-ai-iitkgp.github.io
 
 ## Pages
 
