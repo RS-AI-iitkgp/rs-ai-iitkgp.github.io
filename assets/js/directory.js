@@ -593,7 +593,9 @@
 
   const VIEW_KEY = "doai-view";
   try { localStorage.removeItem(VIEW_KEY); } catch (e) {} // older versions remembered the view for good
-  const rememberView = (v) => { try { sessionStorage.setItem(VIEW_KEY, v); } catch (e) {} };
+  // The events page always opens in grid view and doesn't change what the other pages remember.
+  const REMEMBER_VIEW = cfg.kind !== "event";
+  const rememberView = (v) => { if (REMEMBER_VIEW) try { sessionStorage.setItem(VIEW_KEY, v); } catch (e) {} };
 
   function readUrl() {
     const p = new URLSearchParams(location.search);
@@ -604,7 +606,7 @@
     // A new visit opens in grid view; a switch to list lasts for the rest of the visit
     // (refreshes and other pages) via sessionStorage, and ?view=list in shared links.
     if (view === "list" || view === "grid") state.view = view;
-    else { try { const v = sessionStorage.getItem(VIEW_KEY); if (v === "list" || v === "grid") state.view = v; } catch (e) {} }
+    else if (REMEMBER_VIEW) { try { const v = sessionStorage.getItem(VIEW_KEY); if (v === "list" || v === "grid") state.view = v; } catch (e) {} }
     state.q = p.get("q") || "";
   }
 
@@ -631,12 +633,20 @@
     }
   });
 
-  document.querySelectorAll(".seg button").forEach((b) =>
-    b.addEventListener("click", () => {
-      rememberView(b.dataset.view);
-      setState({ view: b.dataset.view });
-    })
-  );
+  // Grid ↔ list (toolbar buttons and the phone button): switch at once and fade the cards in,
+  // no per-card morphing, keeping the card you were looking at in place.
+  function switchView(view) {
+    if (view === state.view) return;
+    const top = $("#siteHeader").offsetHeight;
+    const anchor = [...grid.children].find((el) => !el.hidden && el.getBoundingClientRect().bottom > top + 8); // first card on screen
+    const before = anchor ? anchor.getBoundingClientRect().top : 0;
+    rememberView(view);
+    settle();
+    setState({ view }, false);
+    if (anchor) window.scrollBy({ top: anchor.getBoundingClientRect().top - before, behavior: "instant" });
+    if (!reduceMotion) { grid.classList.remove("swap"); void grid.offsetWidth; grid.classList.add("swap"); }
+  }
+  document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => switchView(b.dataset.view)));
 
   const clearAll = () => setState({ q: "", group: "all", year: "all" });
   $("#clearBtn").addEventListener("click", clearAll);
@@ -716,18 +726,7 @@
 
   fab.addEventListener("click", openSheet);
 
-  // Switch grid/list while scrolled, keeping the card you were looking at in place.
-  viewFab.addEventListener("click", () => {
-    const top = $("#siteHeader").offsetHeight;
-    const anchor = [...grid.children].find((el) => !el.hidden && el.getBoundingClientRect().bottom > top + 8); // first card on screen
-    const before = anchor ? anchor.getBoundingClientRect().top : 0;
-    const view = state.view === "grid" ? "list" : "grid";
-    rememberView(view);
-    settle();
-    setState({ view }, false);
-    if (anchor) window.scrollBy({ top: anchor.getBoundingClientRect().top - before, behavior: "instant" });
-    if (!reduceMotion) { grid.classList.remove("swap"); void grid.offsetWidth; grid.classList.add("swap"); }
-  });
+  viewFab.addEventListener("click", () => switchView(state.view === "grid" ? "list" : "grid"));
   $("#sheetDone").addEventListener("click", () => closeSheet());
   backdrop.addEventListener("click", () => closeSheet());
   document.addEventListener("keydown", (e) => {

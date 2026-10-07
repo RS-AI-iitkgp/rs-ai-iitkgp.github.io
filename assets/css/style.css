@@ -518,8 +518,8 @@ kbd {
 .sheet-head { display: none; }
 .search-fab { display: none; }
 .view-fab { display: none; }
-@keyframes swap-in { from { opacity: 0; transform: translateY(8px); } }
-.grid.swap { animation: swap-in .35s var(--ease); }
+@keyframes swap-in { from { opacity: 0; } }
+.grid.swap { animation: swap-in .25s ease-out; } /* grid ↔ list: a plain fade */
 .sheet-backdrop {
   position: fixed; inset: 0; z-index: 55; background: rgba(12, 14, 18, .42);
   -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
