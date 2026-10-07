@@ -136,7 +136,10 @@
         <button class="link-btn" type="button" data-clear>Clear filters</button>
       </div>
 
-      <p class="crosslink">Looking for current students? <a href="index.html">See our research scholars →</a></p>
+      <a class="crosslink" href="index.html">
+        <span class="cl-text"><span class="cl-kicker">Looking for current students?</span><span class="cl-title">See our research scholars</span></span>
+        <span class="cl-arrow" aria-hidden="true"><svg width="18" height="18"><use href="#i-arrow-right"/></svg></span>
+      </a>
     </section>
   </main>
 
@@ -172,8 +175,8 @@
       </div>
     </div>
     <div class="container footer-base">
-      <span>© <span id="yearNow"></span> Department of Artificial Intelligence, IIT Kharagpur</span>
-      <span class="credit">Designed by <a href="https://ranjan-sarkar.github.io/" target="_blank" rel="noopener">Ranjan Sarkar</a>, PhD Scholar</span>
+      <span>© <span id="yearNow"></span> Department of Artificial Intelligence, IIT Kharagpur. All rights reserved.</span>
+      <span class="credit">Made by <a href="https://ranjan-sarkar.github.io/" target="_blank" rel="noopener">Ranjan Sarkar</a> in collaboration with AI</span>
       <span>Last updated <span id="lastUpdated"></span><span class="visit-count" id="visitCount" hidden></span></span>
     </div>
   </footer>
@@ -204,10 +207,10 @@
       year: { key: "graduated", label: "Graduated", all: "All years" },
       defaultSort: "name-asc",
       sorts: [
-        ["year-desc", "Graduated: most recent"],
-        ["year-asc", "Graduated: earliest"],
         ["name-asc", "Name: A–Z"],
         ["name-desc", "Name: Z–A"],
+        ["year-desc", "Graduated: most recent"],
+        ["year-asc", "Graduated: earliest"],
       ],
       stats: ({ items }) => ({
         total: items.length,
