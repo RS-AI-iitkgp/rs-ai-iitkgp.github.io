@@ -660,6 +660,9 @@ html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
   .grid.is-list .c-topic, .grid.is-list .c-links { display: none; }
   .grid.is-list .c-photo { width: 72px; height: 72px; font-size: 22px; }
   .grid.is-list .c-label { display: inline; margin-right: 6px; }
+  /* Scholar rows show the research topic in place of the supervisors. */
+  .grid.is-list .card.is-scholar .c-topic { display: -webkit-box; grid-area: sup; font-size: 13px; }
+  .grid.is-list .card.is-scholar .c-sup { display: none; }
 }
 @media (max-width: 560px) {
   .container { width: calc(100% - 32px); }

@@ -129,6 +129,7 @@
     field(s.name, 3);
     field(s.programLabel, 1.2);
     field(s.supervisors, 2);
+    field(s.lab, 1.6, true);
     field(s.position, 1.6, true);
     field(s.organisation, 1.6, true);
     field(s.group, 1.4, true);
@@ -195,6 +196,15 @@
       : esc(label);
   }
 
+  // Lab name, linked to its website in data/labs.js when known.
+  const LAB_SITES = window.LABS || {};
+  function labHTML(name) {
+    const url = safeUrl(LAB_SITES[name]);
+    return url && url !== "#"
+      ? `<a class="sup-link" href="${esc(url)}" target="_blank" rel="noopener">${esc(name)}</a>`
+      : esc(name);
+  }
+
   // Arrow icons for link pills (same stroke as the page's "See our …" arrows); diagonal for links that leave the site.
   const pillArrow = (external) => `<svg class="pill-arrow${external ? " is-ext" : ""}" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="${external ? "M7 17 17 7M9 7h8v8" : "M5 12h14M13 6l6 6-6 6"}"/></svg>`;
   function eventCardHTML(s) {
@@ -249,6 +259,7 @@
       <div class="c-id">
         <h3 class="c-name">${esc(s.name)}</h3>
         ${s.programLabel && s.programLabel !== "PhD" ? `<p class="c-prog">${esc(s.programLabel)}</p>` : ""}
+        ${s.lab ? `<p class="c-pos c-lab">${icon("lab", 15)}<span>${labHTML(s.lab)}</span></p>` : ""}
         ${position}
       </div>
       <p class="c-topic">${text ? `${alumni ? '<span class="c-label">Thesis</span>' : ""}${esc(text)}` : ""}</p>
@@ -259,7 +270,7 @@
   const grid = $("#grid");
   const cards = ITEMS.map((s, i) => {
     const el = document.createElement("article");
-    el.className = "card reveal" + (s.supervisors.length ? "" : " no-sup") + (cfg.kind === "event" ? " is-event" : "")
+    el.className = "card reveal" + (s.supervisors.length ? "" : " no-sup") + (cfg.kind === "event" ? " is-event" : cfg.kind === "scholar" ? " is-scholar" : "")
       + (s.highlights && s.highlights.length ? " has-media" : "");
     el.style.setProperty("--area", HUE.get(s.group));
     el.innerHTML = cardHTML(s);
