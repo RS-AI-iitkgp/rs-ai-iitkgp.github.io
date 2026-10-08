@@ -802,6 +802,7 @@ html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
 .lb-btn .when-on, .lb-btn[aria-pressed="true"] .when-off { display: none; }
 .lb-btn[aria-pressed="true"] .when-on { display: block; }
 .lb-btn:focus-visible, .lb-thumb:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.lb-panel-btn .panel-bottom { display: none; } /* phones swap in the bottom-strip icon (see below) */
 
 /* Slideshow countdown along the top edge */
 .lb-progress {
@@ -851,7 +852,9 @@ html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
   .lb-tools { top: 10px; right: 10px; gap: 6px; }
   .lb-tools .lb-btn { width: 42px; height: 42px; }
   .lb-count, .lightbox.panel-open .lb-count { top: 23px; left: 16px; transform: none; }
-  /* Phones: the gallery panel is a strip along the bottom */
+  /* Phones: the gallery panel is a strip along the bottom, and its button icon says so */
+  .lb-panel-btn .panel-side { display: none; }
+  .lb-panel-btn .panel-bottom { display: block; }
   .lb-panel {
     top: auto; left: 0; width: auto; height: 92px; padding: 10px;
     display: flex; gap: 8px; overflow-x: auto; overflow-y: hidden;
