@@ -1,5 +1,5 @@
 /* ==================================================================
-   EVENTS & ACTIVITIES — edit this list.
+   EVENTS & ACTIVITIES - edit this list.
    ------------------------------------------------------------------
    title        Event name
    date         "6 Oct 2026", "Sep 2025" or "2024" ("YYYY" = not set yet)
@@ -11,7 +11,7 @@
    summary      One or two lines about the event
    links        Buttons, e.g. [{ label: "Slides", url: "https://…" }]
 
-   Detail page (optional) — give an event an `id` to get its own page at
+   Detail page (optional) - give an event an `id` to get its own page at
    event.html?id=<id>, with a photo gallery:
    id           Short unique name, e.g. "teachers-day-2026"
    details      Extra paragraphs for the detail page, e.g. ["…", "…"]
@@ -77,10 +77,10 @@ window.EVENTS = [
       { src: "images/events/rs-day-foundation-day-2026/26.jpg", ar: 1.502, caption: "A question from the audience" },
       { src: "images/events/rs-day-foundation-day-2026/27.jpg", ar: 1.502, caption: "The panel" },
       { src: "images/events/rs-day-foundation-day-2026/28.jpg", ar: 1.502, caption: "Group photo" },
-      { src: "images/events/rs-day-foundation-day-2026/29.jpg", ar: 1.502, caption: "Group photo — left" },
-      { src: "images/events/rs-day-foundation-day-2026/30.jpg", ar: 1.502, caption: "Group photo — centre" },
-      { src: "images/events/rs-day-foundation-day-2026/31.jpg", ar: 1.502, caption: "Group photo — right" },
-      { src: "images/events/rs-day-foundation-day-2026/32.jpg", ar: 1.502, caption: "Group photo — far right" },
+      { src: "images/events/rs-day-foundation-day-2026/29.jpg", ar: 1.502, caption: "Group photo - left" },
+      { src: "images/events/rs-day-foundation-day-2026/30.jpg", ar: 1.502, caption: "Group photo - centre" },
+      { src: "images/events/rs-day-foundation-day-2026/31.jpg", ar: 1.502, caption: "Group photo - right" },
+      { src: "images/events/rs-day-foundation-day-2026/32.jpg", ar: 1.502, caption: "Group photo - far right" },
       { src: "images/events/rs-day-foundation-day-2026/33.jpg", ar: 1.502, caption: "Research scholar presentation" },
       { src: "images/events/rs-day-foundation-day-2026/34.jpg", ar: 1.502, caption: "Questions from the audience" },
       { src: "images/events/rs-day-foundation-day-2026/35.jpg", ar: 1.502, caption: "Research scholar presentation" },
@@ -139,9 +139,9 @@ window.EVENTS = [
 
   // ---- IdoAI talk series ----
   // Card slides: the 4 most recent photos from the IdoAI gallery (idoai-iitkgp.github.io/gallery.html), cropped to 16:9.
-  { title: "IdoAI — Interdisciplinary Opportunities with AI", date: "21 Jul 2025", category: "IdoAI Talk Series", venue: "CRR Building, IIT Kharagpur",
+  { title: "IdoAI - Interdisciplinary Opportunities with AI", date: "21 Jul 2025", category: "IdoAI Talk Series", venue: "CRR Building, IIT Kharagpur",
     slides: ["images/events/idoai/01.jpg", "images/events/idoai/02.jpg", "images/events/idoai/03.jpg", "images/events/idoai/04.jpg"],
     slidesLink: "https://idoai-iitkgp.github.io/",
-    summary: "The department's weekly talk series, every Tuesday 5–6 PM, coordinated by PhD scholars. The inaugural session featured speakers from the University of South Florida, Princeton University, Indian Railways and the Zoological Survey of India.", 
+    summary: "The department's weekly talk series, every Tuesday 5-6 PM, coordinated by PhD scholars. The inaugural session featured speakers from the University of South Florida, Princeton University, Indian Railways and the Zoological Survey of India.", 
     links: [{ label: "Talk series", url: "https://idoai-iitkgp.github.io/" }, { label: "All talks", url: "https://idoai-iitkgp.github.io/events.html" }, { label: "Propose a talk", url: "https://forms.gle/89a4wQrrdy2YnLNX6" }] },
 ];

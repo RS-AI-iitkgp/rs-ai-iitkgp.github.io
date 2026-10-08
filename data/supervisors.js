@@ -1,5 +1,5 @@
 /* ==================================================================
-   SUPERVISOR WEBSITES — name → homepage.
+   SUPERVISOR WEBSITES - name → homepage.
    ------------------------------------------------------------------
    Cards show every supervisor as "Dr. <name>". If the name is listed
    here, it links to that website. Names must match the spelling used
@@ -8,7 +8,7 @@
    Sources: Department of AI faculty page (ai.iitkgp.ac.in) and the
    faculty members' own IIT Kharagpur homepages.
    Not yet found: Manjira Sinha, Debanjan Das, Sanjay Ghosh,
-   Arijit Mondal — add them here when known.
+   Arijit Mondal - add them here when known.
    ================================================================== */
 
 window.SUPERVISORS = {

@@ -345,7 +345,7 @@ kbd {
 }
 .c-joined b { font-weight: 600; color: var(--ink); }
 /* Narrow cards (phones, or three columns on ~1000px screens): the label beside the photo splits into
-   two lines — "Joined" / "Jul 2024" — and event tags wrap, so it never runs into the photo. */
+   two lines - "Joined" / "Jul 2024" - and event tags wrap, so it never runs into the photo. */
 .card { container-type: inline-size; }
 .grid:not(.is-list) .card { column-gap: 12px; }
 .grid:not(.is-list) .c-joined { min-width: 0; }

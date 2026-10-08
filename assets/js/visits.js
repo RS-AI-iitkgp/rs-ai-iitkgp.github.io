@@ -1,5 +1,5 @@
 /* ==================================================================
-   Visitor counts — GoatCounter (goatcounter.com): free for
+   Visitor counts - GoatCounter (goatcounter.com): free for
    non-commercial sites, no cookies, no personal data collected.
 
    Set up once:

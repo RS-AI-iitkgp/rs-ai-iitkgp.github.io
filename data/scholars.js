@@ -1,5 +1,5 @@
 /* ==================================================================
-   CURRENT RESEARCH SCHOLARS (PhD and MS by Research) — edit this list.
+   CURRENT RESEARCH SCHOLARS (PhD and MS by Research) - edit this list.
    ------------------------------------------------------------------
    name         Full name
    program      "MS" for MS (by Research) scholars; leave out for regular PhD.
@@ -10,11 +10,11 @@
                 "AI91R…" = July of that year, "AI92R…" = January of the
                 next year (e.g. 24AI92R01 → "Jan 2025").
                 "YYYY" is a template placeholder and sorts last.
-   area         Broad research area — used for the area filter and
+   area         Broad research area - used for the area filter and
                 colour coding. Keep spelling identical across entries.
                 "" shows as "Not specified".
    topic        Research interests / thesis title
-   lab          Research lab, e.g. "RHPI Lab" — shown under the name and
+   lab          Research lab, e.g. "RHPI Lab" - shown under the name and
                 linked to the website in data/labs.js ("" or left out hides it)
    supervisors  One or more supervisor names WITHOUT a title, e.g.
                 ["Jiaul Hoque Paik"]. The page adds "Dr." and links the
@@ -26,12 +26,12 @@
    website, scholar, linkedin, github
                 Full URLs (https://...). "#" is a placeholder; "" hides it.
 
-   Sources: names, emails and research interests — "Research Students"
+   Sources: names, emails and research interests - "Research Students"
    list on the Department of AI page, iitkgp.ac.in (fetched 7 Oct 2026).
-   Joining dates and supervisors — department scholar sheet (Teacher's
-   Day 2025), for the scholars listed there. Profile links — public web
+   Joining dates and supervisors - department scholar sheet (Teacher's
+   Day 2025), for the scholars listed there. Profile links - public web
    profiles that mention IIT Kharagpur. Areas are grouped from the
-   listed research interests — adjust freely.
+   listed research interests - adjust freely.
    ================================================================== */
 
 window.SCHOLARS = [

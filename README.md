@@ -1,4 +1,4 @@
-# PhD Scholars — Department of AI, IIT Kharagpur
+# PhD Scholars - Department of AI, IIT Kharagpur
 
 A static website listing the department's research scholars (PhD and MS by Research), alumni and events.
 
@@ -6,9 +6,9 @@ A static website listing the department's research scholars (PhD and MS by Resea
 
 ## Pages
 
-- `index.html` — current research scholars (PhD and MS by Research)
-- `alumni.html` — PhD alumni and where they work now
-- `events.html` — events and activities (Research Scholars' Day, IdoAI talks, celebrations)
+- `index.html` - current research scholars (PhD and MS by Research)
+- `alumni.html` - PhD alumni and where they work now
+- `events.html` - events and activities (Research Scholars' Day, IdoAI talks, celebrations)
 
 All pages offer typo-tolerant search, filters, sorting, grid and list views,
 dark mode, and a mobile search button.

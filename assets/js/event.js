@@ -1,5 +1,5 @@
 /* ==================================================================
-   Event detail page (event.html?id=<event id>) — description and a
+   Event detail page (event.html?id=<event id>) - description and a
    photo gallery with a full-screen viewer. Data: data/events.js.
    ================================================================== */
 (function () {
@@ -74,7 +74,7 @@
         // Without `ar` in the data the tile starts at 3:2 and takes the real shape once the photo loads.
         ? `<div class="gallery">${photos.map((p, i) => `
             <button class="g-item" type="button" data-i="${i}" style="--ar: ${p.ar || 1.5}"${p.ar ? "" : " data-measure"} aria-label="Open photo ${i + 1} of ${photos.length}${p.caption ? `: ${esc(p.caption)}` : ""}">
-              <img src="${esc(p.thumb)}" data-full="${esc(p.src)}" alt="${esc(p.caption || `${ev.title} — photo ${i + 1}`)}" loading="lazy" decoding="async"
+              <img src="${esc(p.thumb)}" data-full="${esc(p.src)}" alt="${esc(p.caption || `${ev.title} - photo ${i + 1}`)}" loading="lazy" decoding="async"
                    onload="this.classList.add('loaded'); var t = this.closest('.g-item'); if (t.hasAttribute('data-measure')) t.style.setProperty('--ar', (this.naturalWidth / this.naturalHeight).toFixed(3));"onerror="if (this.dataset.full) { this.src = this.dataset.full; this.removeAttribute('data-full'); } else this.closest('.g-item').classList.add('broken');">
               ${p.caption ? `<span class="g-cap">${esc(p.caption)}</span>` : ""}
             </button>`).join("")}</div>`
@@ -166,7 +166,7 @@
       const full = new Image();
       full.onload = () => { if (token === loadToken) { fullWidth = full.naturalWidth; img.src = p.src; } };
       full.src = p.src;
-      img.alt = p.caption || `${ev.title} — photo ${index + 1}`;
+      img.alt = p.caption || `${ev.title} - photo ${index + 1}`;
       cap.textContent = p.caption || "";
       cap.hidden = !p.caption;
       count.textContent = `${index + 1} / ${photos.length}`;
@@ -187,7 +187,7 @@
     }
     if ("ResizeObserver" in window) new ResizeObserver(() => { if (!lb.hidden) { fit(); resetZoom(); } }).observe(stage);
 
-    /* Zoom & pan — so faces in big group photos can be seen at full resolution */
+    /* Zoom & pan - so faces in big group photos can be seen at full resolution */
     let z = 1, tx = 0, ty = 0;
     const nativeZoom = () => (fullWidth && img.offsetWidth ? fullWidth / img.offsetWidth : 2);
     const maxZoom = () => Math.max(2, nativeZoom() * 1.5);
@@ -236,7 +236,7 @@
     }
     const zoomBy = (f) => { const c = baseCenter(); zoomTo(z * f, c.x + tx, c.y + ty); };
 
-    // Mouse drag, touch drag, pinch and double-tap — all through pointer events on the photo.
+    // Mouse drag, touch drag, pinch and double-tap - all through pointer events on the photo.
     const pts = new Map();
     let drag = null, pinch = null, moved = false, gestured = false, lastTap = 0, lastType = "mouse", wheelTimer = 0;
     const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);

@@ -1,5 +1,5 @@
 /* ==================================================================
-   LAB WEBSITES — lab name → homepage.
+   LAB WEBSITES - lab name → homepage.
    ------------------------------------------------------------------
    Scholar cards show the "lab" from data/scholars.js under the name.
    If the lab is listed here, the name links to that website. Names

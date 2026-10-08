@@ -1,5 +1,5 @@
 /* ==================================================================
-   Directory page logic — shared by index.html (scholars) and
+   Directory page logic - shared by index.html (scholars) and
    alumni.html. Each page sets window.DIRECTORY before loading this.
    ================================================================== */
 (function () {
@@ -183,7 +183,7 @@
   const icon = (id, size = 16) => `<svg width="${size}" height="${size}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
   // data-tip / data-email feed the hover popup (see "Link popups" below).
   const linkIcon = (href, id, label, name, email = "") =>
-    href ? `<a href="${esc(href)}" ${href.startsWith("#") ? "" : 'target="_blank" rel="noopener"'} data-tip="${label}"${email ? ` data-email="${esc(email)}"` : ""} aria-label="${label} — ${esc(name)}">${icon(id)}</a>` : "";
+    href ? `<a href="${esc(href)}" ${href.startsWith("#") ? "" : 'target="_blank" rel="noopener"'} data-tip="${label}"${email ? ` data-email="${esc(email)}"` : ""} aria-label="${label} - ${esc(name)}">${icon(id)}</a>` : "";
 
   // "Dr. Name", linked to the homepage in data/supervisors.js when known.
   const SUP_SITES = window.SUPERVISORS || {};
@@ -580,7 +580,7 @@
     const [one, many] = cfg.noun;
     const filtered = state.q.trim() || state.group !== "all" || state.year !== "all" || state.prog !== "all";
     $("#resultText").innerHTML = searching && searchMode === "any" && shown
-      ? `No exact match — showing <b>${shown}</b> close ${shown === 1 ? "match" : "matches"}`
+      ? `No exact match - showing <b>${shown}</b> close ${shown === 1 ? "match" : "matches"}`
       : filtered
         ? `Showing <b>${shown}</b> of ${cards.length} ${cards.length === 1 ? one : many}${searching && shown > 1 ? " · best matches first" : ""}`
         : `<b>${cards.length}</b> ${cards.length === 1 ? one : many}`;
@@ -823,7 +823,7 @@
     else countUp(el, v);
   });
   const batchLabel = $("#batchLabel");
-  if (batchLabel && YEARS.length > 1) batchLabel.textContent += ` · ${YEARS[YEARS.length - 1]}–${YEARS[0]}`;
+  if (batchLabel && YEARS.length > 1) batchLabel.textContent += ` · ${YEARS[YEARS.length - 1]}-${YEARS[0]}`;
 
   /* ---------- Link popups ---------- */
   // One floating popup (cards clip overflow) naming the hovered link; for email it shows the
