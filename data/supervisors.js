@@ -8,7 +8,7 @@
    Sources: Department of AI faculty page (ai.iitkgp.ac.in) and the
    faculty members' own IIT Kharagpur homepages.
    Not yet found: Manjira Sinha, Debanjan Das, Sanjay Ghosh,
-   Arijit Mondal - add them here when known.
+   Arijit Mondal, Pabitra Mitra, Abir Das - add them here when known.
    ================================================================== */
 
 window.SUPERVISORS = {

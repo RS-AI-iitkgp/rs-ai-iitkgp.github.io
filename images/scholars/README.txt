@@ -60,6 +60,7 @@ sayantan-saha.jpg
 shamba-chowdhury.jpg
 shiva-agarwal.jpg
 sista-raviteja.jpg
+soma-bandyopadhyay.jpg
 soumyadipta-banerjee.jpg
 sourasis-das.jpg
 sourin-das.jpg
