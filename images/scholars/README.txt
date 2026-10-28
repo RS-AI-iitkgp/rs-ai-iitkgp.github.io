@@ -17,14 +17,10 @@ To use a different name or format (e.g. .png or .webp), change the
 Expected file names
 -------------------
 aaryama-shree.jpg
-abhishek-kumar.jpg
 ahon-bandyopadhyay.jpg
 aman-kumar.jpg
 amrita-garai.jpg
 animesh.jpg
-anirban-lahiri.jpg
-anjali-raj.jpg
-anupam-borthakur.jpg
 anurag-sharma.jpg
 ashiqur-rahaman-molla.jpg
 ashraf-haroon-rashid.jpg
@@ -36,7 +32,6 @@ bitan-adak.jpg
 chhavi-chaudhary.jpg
 debarshi-dey.jpg
 debayon-dhar-chowdhury.jpg
-dipankar-mandal.jpg
 dipayan-dewan.jpg
 dipojjwal-ghosh.jpg
 jefferson-warie.jpg
@@ -45,7 +40,6 @@ kunal-pradeep-pimparkhede.jpg
 laveena-kewlani.jpg
 madhusudan-verma.jpg
 manem-chandra-sekhar-lokesh.jpg
-meshram-suraj-shalikram.jpg
 neha-kumari.jpg
 p-b-salim.jpg
 panchagnula-vasundhara-vinuthna.jpg
@@ -56,12 +50,9 @@ ranjan-sarkar.jpg
 rekha-regar.jpg
 rohan-saha.jpg
 rupali-chandrakant-patole.jpg
-sayantan-saha.jpg
 shamba-chowdhury.jpg
 shiva-agarwal.jpg
 sista-raviteja.jpg
-soma-bandyopadhyay.jpg
-soumyadipta-banerjee.jpg
 sourasis-das.jpg
 sourin-das.jpg
 srinjoy-chanda.jpg
@@ -70,7 +61,6 @@ subhradeep-rang.jpg
 sudip-kumar-bhattacharya.jpg
 sujoy-sarkar.jpg
 suparnakanti-das.jpg
-swarnava-dey.jpg
 trishank-saharia.jpg
 trishita-mukherjee.jpg
 y-raghu-vamshi.jpg

@@ -128,6 +128,7 @@
     };
     field(s.name, 3);
     field(s.programLabel, 1.2);
+    field(s.status, 1.2);
     field(s.supervisors, 2);
     field(s.lab, 1.6, true);
     field(s.position, 1.6, true);
@@ -182,8 +183,10 @@
   /* ---------- Cards ---------- */
   const icon = (id, size = 16) => `<svg width="${size}" height="${size}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
   // data-tip / data-email feed the hover popup (see "Link popups" below).
+  // A "#" placeholder shows as a faded, non-clickable icon so every card keeps the same row of links.
   const linkIcon = (href, id, label, name, email = "") =>
-    href ? `<a href="${esc(href)}" ${href.startsWith("#") ? "" : 'target="_blank" rel="noopener"'} data-tip="${label}"${email ? ` data-email="${esc(email)}"` : ""} aria-label="${label} - ${esc(name)}">${icon(id)}</a>` : "";
+    href === "#" ? `<span class="c-link-off" title="${label} not added yet" aria-hidden="true">${icon(id)}</span>`
+    : href ? `<a href="${esc(href)}" ${href.startsWith("#") ? "" : 'target="_blank" rel="noopener"'} data-tip="${label}"${email ? ` data-email="${esc(email)}"` : ""} aria-label="${label} - ${esc(name)}">${icon(id)}</a>` : "";
 
   // "Dr. Name", linked to the homepage in data/supervisors.js when known.
   const SUP_SITES = window.SUPERVISORS || {};
@@ -242,7 +245,10 @@
     if (cfg.kind === "event") return eventCardHTML(s);
     const alumni = cfg.kind === "alumni";
     const sups = s.supervisors;
-    const text = alumni ? s.thesis : s.topic;
+    // Alumni: the thesis title; until it is known, their research interest (if given).
+    const noThesis = alumni && (!s.thesis || PLACEHOLDER.test(String(s.thesis).trim())) && s.topic;
+    const text = alumni && !noThesis ? s.thesis : s.topic;
+    const label = alumni ? (noThesis ? "Research" : "Thesis") : "";
     const links = [
       s.email ? linkIcon(`mailto:${s.email}`, "mail", "Email", s.name, s.email) : "",
       linkIcon(safeUrl(s.linkedin), "linkedin", "LinkedIn", s.name),
@@ -255,14 +261,14 @@
       : "";
     return `
       <div class="c-photo" aria-hidden="true">${esc(initials(s.name))}${s.photo ? `<img src="${esc(s.photo)}" alt="" loading="lazy" decoding="async" onload="this.classList.add('loaded')" onerror="this.remove()">` : ""}</div>
-      ${s.yearLabel ? `<span class="c-joined">${esc(cfg.year.label)} <b>${esc(s.yearLabel)}</b></span>` : ""}
+      ${s.status ? `<span class="c-joined"><b>${esc(s.status)}</b></span>` : s.yearLabel ? `<span class="c-joined">${esc(cfg.year.label)} <b>${esc(s.yearLabel)}</b></span>` : ""}
       <div class="c-id">
         <h3 class="c-name">${esc(s.name)}</h3>
         ${s.programLabel && s.programLabel !== "PhD" ? `<p class="c-prog">${esc(s.programLabel)}</p>` : ""}
         ${s.lab ? `<p class="c-pos c-lab">${icon("lab", 15)}<span>${labHTML(s.lab)}</span></p>` : ""}
         ${position}
       </div>
-      <p class="c-topic">${text ? `${alumni ? '<span class="c-label">Thesis</span>' : ""}${esc(text)}` : ""}</p>
+      <p class="c-topic">${text ? `${label ? `<span class="c-label">${label}</span>` : ""}${esc(text)}` : ""}</p>
       ${sups.length ? `<div class="c-sup"><span class="c-label">${sups.length > 1 ? "Supervisors" : "Supervisor"}</span>${sups.map(supervisorHTML).join(", ")}</div>` : ""}
       <div class="c-links">${links}</div>`;
   }

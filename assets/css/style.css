@@ -379,12 +379,14 @@ kbd {
 .sup-link:hover { color: var(--area); text-decoration-color: currentColor; }
 .c-links { grid-area: links; display: flex; gap: 6px; margin-top: 16px; }
 .card.no-sup .c-links { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
-.c-links a {
+.c-links a, .c-links .c-link-off {
   display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 9px;
   color: var(--muted); text-decoration: none;
   transition: color .2s ease, background-color .2s ease, border-color .2s ease, transform .2s var(--ease);
 }
 .c-links a:hover { color: var(--surface); background: var(--area); border-color: var(--area); transform: translateY(-2px); }
+/* Link not added yet ("#" in the data file) */
+.c-links .c-link-off { opacity: .3; border-style: dashed; cursor: default; }
 
 /* Link popup: one floating element, placed by directory.js above the hovered link */
 .link-tip {
@@ -495,7 +497,7 @@ kbd {
 .grid.is-list .c-topic { -webkit-line-clamp: 2; font-size: 13.5px; }
 .grid.is-list .c-sup { padding: 0; border: 0; font-size: 13px; }
 .grid.is-list .c-joined { justify-self: start; align-self: center; }
-.grid.is-list .c-links a { width: 30px; height: 30px; border-color: transparent; }
+.grid.is-list .c-links a, .grid.is-list .c-links .c-link-off { width: 30px; height: 30px; border-color: transparent; }
 .grid.is-list .card.no-sup .c-links { padding-top: 0; border-top: 0; }
 
 /* Empty state */
