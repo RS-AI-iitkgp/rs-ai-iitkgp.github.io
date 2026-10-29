@@ -2,7 +2,7 @@
    "Update your entry" form (update.html). Sends the details and a
    photo to a Google Apps Script web app, which adds a row to a Google
    Sheet and saves the photo in a Google Drive folder.
-   Script and set-up steps: apps-script/update-form.gs.
+   The script itself is kept out of the public repository.
    ================================================================== */
 (function () {
   "use strict";

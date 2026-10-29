@@ -22,7 +22,6 @@ events.html, update.html  pages
 assets/css/style.css      styles
 assets/js/directory.js    search, filters, cards
 assets/js/update.js       update form (set ENDPOINT here)
-apps-script/update-form.gs  receiver for the update form (runs in Google Apps Script)
 data/scholars.js          research scholar data
 data/alumni.js            alumni data
 data/events.js            events data
@@ -33,9 +32,9 @@ images/                   photos and logo
 ## Update form
 
 `update.html` sends each submission to a Google Apps Script web app, which adds
-a row to a Google Sheet and saves the photo in Google Drive. Set-up steps are at
-the top of `apps-script/update-form.gs`; then put the web app URL in `ENDPOINT`
-at the top of `assets/js/update.js`. Until then the form asks people to email.
+a row to a Google Sheet and saves the photo in Google Drive. The script is kept
+out of this repository (in a local `apps-script/` folder, ignored by git); its
+web app URL goes in `ENDPOINT` at the top of `assets/js/update.js`.
 
 ## Licence
 
