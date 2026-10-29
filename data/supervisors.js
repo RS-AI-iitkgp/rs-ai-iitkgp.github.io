@@ -36,6 +36,7 @@ window.SUPERVISORS = {
   "Pralay Mitra":               "https://cse.iitkgp.ac.in/~pralay/",
   "Soumyajit Dey":              "https://cse.iitkgp.ac.in/~soumya/",
   "Sudeshna Sarkar":            "https://cse.iitkgp.ac.in/~sudeshna/",
+  "Swanand Khare":              "https://srkhare.github.io/",
 };
 
 // Shown as "Prof." instead of "Dr." - same spelling as above.
@@ -46,8 +47,10 @@ window.PROFESSORS = [
   "Jiaul Hoque Paik",
   "Niloy Ganguly",
   "Partha Pratim Chakrabarti",
+  "Pawan Goyal",
   "Plaban Kumar Bhowmick",
   "Pralay Mitra",
+  "Soumyajit Dey",
   "Sudeshna Sarkar",
   "Swanand Khare",
 ];

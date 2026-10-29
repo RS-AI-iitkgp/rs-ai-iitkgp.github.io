@@ -198,13 +198,15 @@
       : esc(label);
   }
 
-  // Lab name, linked to its website in data/labs.js when known.
+  // Lab name(s), each linked to its website in data/labs.js when known ("SEAL Lab, SHADES Lab" links both).
   const LAB_SITES = window.LABS || {};
-  function labHTML(name) {
-    const url = safeUrl(LAB_SITES[name]);
-    return url && url !== "#"
-      ? `<a class="sup-link" href="${esc(url)}" target="_blank" rel="noopener">${esc(name)}</a>`
-      : esc(name);
+  function labHTML(labs) {
+    return labs.split(",").map((n) => n.trim()).filter(Boolean).map((name) => {
+      const url = safeUrl(LAB_SITES[name]);
+      return url && url !== "#"
+        ? `<a class="sup-link" href="${esc(url)}" target="_blank" rel="noopener">${esc(name)}</a>`
+        : esc(name);
+    }).join(", ");
   }
 
   // Arrow icons for link pills (same stroke as the page's "See our …" arrows); diagonal for links that leave the site.
