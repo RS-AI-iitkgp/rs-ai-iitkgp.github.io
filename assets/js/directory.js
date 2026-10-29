@@ -495,7 +495,7 @@
   // Programme tabs under the heading. "All" leaves out working professionals, who have their own tab.
   // The third entry is the shorter label shown on phones.
   const progTabs = $("#progTabs");
-  const PROG_TABS = [["all", "All", "All"], ["PhD", "Regular PhD", "PhD"], ["MS by Research", "MS by Research", "MS"], ["Working Professional", "Working Professional", "Working Prof."]];
+  const PROG_TABS = [["all", "All", "All"], ["PhD", "Regular PhD", "PhD"], ["MS by Research", "MS by Research", "MS"], ["Working Professional", "Working Professional", "Working"]];
   const PROGS = progTabs ? PROG_TABS.slice(1).map(([v]) => v) : [];
   const inProg = (s, prog) => (prog === "all" ? s.progKey !== "Working Professional" : s.progKey === prog);
   if (progTabs) progTabs.innerHTML = PROG_TABS.map(([v, label, short]) =>

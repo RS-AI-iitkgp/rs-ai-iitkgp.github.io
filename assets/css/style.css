@@ -228,7 +228,7 @@ h1 span { color: var(--accent); }
 }
 .prog-tabs button[aria-pressed="true"] .pt-n { background: var(--surface); color: var(--accent); }
 .pt-s { display: none; }
-/* Phones: short labels (PhD, MS, Working Prof.) and tighter tabs so all four fit on one line */
+/* Phones: short labels (PhD, MS, Working) and tighter tabs so all four fit on one line */
 @media (max-width: 600px) {
   .pt-l { display: none; }
   .pt-s { display: inline; }
