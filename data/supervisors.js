@@ -49,4 +49,5 @@ window.PROFESSORS = [
   "Plaban Kumar Bhowmick",
   "Pralay Mitra",
   "Sudeshna Sarkar",
+  "Swanand Khare",
 ];
