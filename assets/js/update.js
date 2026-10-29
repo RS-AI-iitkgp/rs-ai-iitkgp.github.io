@@ -262,11 +262,13 @@
     }).join(" ");
   }
 
+  const PROFS = new Set(window.PROFESSORS || []);
+  const titled = (s) => (/^(dr|prof)\b/i.test(s) ? s : `${PROFS.has(s) ? "Prof." : "Dr."} ${s}`);
   const initials = (name) => name.replace(/[^A-Za-z ]/g, " ").split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
   function meta(p) {
     const sup = [].concat(p.supervisors || []).map(clean).filter(Boolean)[0];
     if (p.list === "alumni") return [p.status || (clean(p.graduated) ? `PhD ${p.graduated}` : "Alumni"), clean(p.organisation)].filter(Boolean).join(" · ");
-    return [clean(p.joined) && `Joined ${p.joined}`, sup && `Dr. ${sup}`].filter(Boolean).join(" · ");
+    return [clean(p.joined) && `Joined ${p.joined}`, sup && titled(sup)].filter(Boolean).join(" · ");
   }
 
   function renderFinder() {
@@ -391,7 +393,7 @@
     const set = (name, v) => { f[name].value = clean(v); };
     ["name", "topic", "lab", "email", "website", "scholar", "linkedin", "github", "position", "organisation", "thesis"].forEach((k) => set(k, p[k]));
     f.supervisors.value = [].concat(p.supervisors || []).map(clean).filter(Boolean)
-      .map((s) => (/^(dr|prof)\b/i.test(s) ? s : `Dr. ${s}`)).join(", ");
+      .map(titled).join(", ");
     if (p.list === "scholar") f.program.value = p.program === "MS" ? "MS (by Research)" : p.program === "Working Professional" ? "PhD (Working Professional)" : "PhD";
     const m = String(p.joined || "").match(/([A-Za-z]{3})?[a-z]*\s*(\d{4})/);
     f.joinedMonth.value = m && m[1] ? m[1][0].toUpperCase() + m[1].slice(1, 3).toLowerCase() : "";

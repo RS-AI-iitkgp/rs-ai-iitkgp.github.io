@@ -1,8 +1,9 @@
 /* ==================================================================
    SUPERVISOR WEBSITES - name → homepage.
    ------------------------------------------------------------------
-   Cards show every supervisor as "Dr. <name>". If the name is listed
-   here, it links to that website. Names must match the spelling used
+   Cards show every supervisor as "Dr. <name>", or "Prof. <name>" for
+   those in PROFESSORS below. If the name is listed in SUPERVISORS, it
+   links to that website. Names must match the spelling used
    in data/scholars.js and data/alumni.js exactly.
 
    Sources: Department of AI faculty page (ai.iitkgp.ac.in) and the
@@ -36,3 +37,16 @@ window.SUPERVISORS = {
   "Soumyajit Dey":              "https://cse.iitkgp.ac.in/~soumya/",
   "Sudeshna Sarkar":            "https://cse.iitkgp.ac.in/~sudeshna/",
 };
+
+// Shown as "Prof." instead of "Dr." - same spelling as above.
+window.PROFESSORS = [
+  "Arnab Sarkar",
+  "Debdeep Mukhopadhyay",
+  "Debdoot Sheet",
+  "Jiaul Hoque Paik",
+  "Niloy Ganguly",
+  "Partha Pratim Chakrabarti",
+  "Plaban Kumar Bhowmick",
+  "Pralay Mitra",
+  "Sudeshna Sarkar",
+];

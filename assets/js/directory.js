@@ -188,11 +188,12 @@
     href === "#" ? `<span class="c-link-off" title="${label} not added yet" aria-hidden="true">${icon(id)}</span>`
     : href ? `<a href="${esc(href)}" ${href.startsWith("#") ? "" : 'target="_blank" rel="noopener"'} data-tip="${label}"${email ? ` data-email="${esc(email)}"` : ""} aria-label="${label} - ${esc(name)}">${icon(id)}</a>` : "";
 
-  // "Dr. Name", linked to the homepage in data/supervisors.js when known.
+  // "Dr. Name" ("Prof. Name" for PROFESSORS), linked to the homepage in data/supervisors.js when known.
   const SUP_SITES = window.SUPERVISORS || {};
+  const PROFS = new Set(window.PROFESSORS || []);
   function supervisorHTML(name) {
     if (PLACEHOLDER.test(name)) return esc(name);
-    const label = /^(dr|prof)\.?\s/i.test(name) ? name : `Dr. ${name}`;
+    const label = /^(dr|prof)\.?\s/i.test(name) ? name : `${PROFS.has(name) ? "Prof." : "Dr."} ${name}`;
     const url = safeUrl(SUP_SITES[name]);
     return url && url !== "#"
       ? `<a class="sup-link" href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}</a>`
