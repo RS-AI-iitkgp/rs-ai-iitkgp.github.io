@@ -2,6 +2,9 @@
    PhD ALUMNI - edit this list.
    ------------------------------------------------------------------
    name          Full name
+   program       "MS" for MS (by Research), "Working Professional" for
+                 working-professional PhDs; leave out for regular PhD.
+                 Used for the programme tabs above the directory.
    joined        Year of joining the PhD programme (optional)
    graduated     Year the PhD was awarded, e.g. 2023. Used for the
                  year filter and sorting. "YYYY" is a template

@@ -55,12 +55,10 @@
       if (!s.id && s.slidesLink) s.highlights = [].concat(s.slides || []).map(imgUrl).filter(Boolean).map((u) => ({ full: u, thumb: u }));
     } else {
       s.supervisors = (Array.isArray(s.supervisors) ? s.supervisors : [s.supervisors]).filter(Boolean);
-      if (cfg.kind === "scholar") {
-        // "MS" → "MS by Research"; any other text is shown as-is (e.g. "PhD · Working Professional"); default "PhD".
-        const prog = String(s.program || "").trim();
-        s.programLabel = /^ms\b/i.test(prog) ? "MS by Research" : prog || "PhD";
-        s.progKey = /working/i.test(prog) ? "Working Professional" : /^ms\b/i.test(prog) ? "MS by Research" : "PhD";
-      }
+      // Scholars and alumni: "MS" → "MS by Research"; any other text is shown as-is (e.g. "Working Professional"); default "PhD".
+      const prog = String(s.program || "").trim();
+      s.programLabel = /^ms\b/i.test(prog) ? "MS by Research" : prog || "PhD";
+      s.progKey = /working/i.test(prog) ? "Working Professional" : /^ms\b/i.test(prog) ? "MS by Research" : "PhD";
     }
     return s;
   });
@@ -492,8 +490,14 @@
   const groupSel = $("#group");
   const yearSel = $("#year");
   const sortSel = $("#sort");
-  const progSel = $("#prog");
-  const PROGS = progSel ? ["PhD", "MS by Research", "Working Professional"].filter((g) => ITEMS.some((s) => s.progKey === g)) : [];
+  // Programme tabs under the heading. "All" leaves out working professionals, who have their own tab.
+  const progTabs = $("#progTabs");
+  const PROG_TABS = [["all", "All"], ["PhD", "Regular PhD"], ["MS by Research", "MS by Research"], ["Working Professional", "Working Professional"]];
+  const PROGS = progTabs ? PROG_TABS.slice(1).map(([v]) => v) : [];
+  const inProg = (s, prog) => (prog === "all" ? s.progKey !== "Working Professional" : s.progKey === prog);
+  if (progTabs) progTabs.innerHTML = PROG_TABS.map(([v, label]) =>
+    `<button type="button" data-prog="${esc(v)}" aria-pressed="false">${esc(label)}<span class="pt-n"></span></button>`).join("");
+  const progBtns = progTabs ? [...progTabs.querySelectorAll("button")] : [];
 
   groupSel.innerHTML = [`<option value="all">${esc(cfg.group.all)}</option>`, ...GROUPS.map((g) => `<option value="${esc(g)}" data-hue="${HUE.get(g)}">${esc(g)}</option>`)].join("");
   const groupOpts = [...groupSel.options];
@@ -502,19 +506,11 @@
     YEARS.map((y) => `<option value="${y}">${esc(`${cfg.year.label} ${y}`.trim())}</option>`).join("");
   if (!YEARS.length) yearSel.closest(".select").hidden = true;
 
-  if (progSel) {
-    const PROG_LABEL = { PhD: "Regular PhD" }; // full-time PhD (working professionals have their own option)
-    progSel.innerHTML = `<option value="all">All programmes</option>` + PROGS.map((g) => `<option value="${esc(g)}">${esc(PROG_LABEL[g] || g)}</option>`).join("");
-    if (PROGS.length < 2) progSel.closest(".select").hidden = true;
-  }
-  const progOpts = progSel ? [...progSel.options] : [];
-
   sortSel.innerHTML = cfg.sorts.map(([v, label]) => `<option value="${v}">${esc(label)}</option>`).join("");
 
   const groupDD = Dropdown(groupSel, { showCount: true });
   const yearDD = Dropdown(yearSel);
   const sortDD = Dropdown(sortSel);
-  const progDD = progSel ? Dropdown(progSel, { showCount: true }) : null;
 
   /* ---------- Apply state ---------- */
   let searchMode = "all"; // "all" words must match; falls back to "any" when nothing matches all
@@ -531,7 +527,7 @@
   const passesFilters = (c, ignore = "") =>
     (ignore === "group" || state.group === "all" || c.s.group === state.group)
     && (state.year === "all" || String(c.s.year) === state.year)
-    && (ignore === "prog" || state.prog === "all" || c.s.progKey === state.prog);
+    && (ignore === "prog" || !progTabs || inProg(c.s, state.prog));
 
   function matches(c, ignore = "") {
     if (!passesFilters(c, ignore)) return false;
@@ -563,16 +559,17 @@
       const g = o.value;
       o.dataset.count = cards.filter((c) => matches(c, "group") && (g === "all" || c.s.group === g)).length;
     });
-    progOpts.forEach((o) => {
-      const g = o.value;
-      o.dataset.count = cards.filter((c) => matches(c, "prog") && (g === "all" || c.s.progKey === g)).length;
+    progBtns.forEach((b) => {
+      const n = cards.filter((c) => matches(c, "prog") && inProg(c.s, b.dataset.prog)).length;
+      b.dataset.count = n;
+      b.querySelector(".pt-n").textContent = n;
+      b.classList.toggle("is-empty", !n);
+      b.setAttribute("aria-pressed", String(b.dataset.prog === state.prog));
     });
     groupSel.value = state.group;
     yearSel.value = state.year;
     sortSel.value = state.sort;
-    if (progSel) progSel.value = state.prog;
-    [groupDD, yearDD, sortDD, progDD].forEach((d) => d && d.sync());
-    if (progSel) progSel.closest(".select").classList.toggle("is-active", state.prog !== "all");
+    [groupDD, yearDD, sortDD].forEach((d) => d.sync());
     groupSel.closest(".select").classList.toggle("is-active", state.group !== "all");
     yearSel.closest(".select").classList.toggle("is-active", state.year !== "all");
     document.querySelectorAll(".seg button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === state.view)));
@@ -585,17 +582,37 @@
     }
 
     const [one, many] = cfg.noun;
-    const filtered = state.q.trim() || state.group !== "all" || state.year !== "all" || state.prog !== "all";
+    // The programme tab picks which people count; search and dropdowns filter within it.
+    const total = progTabs ? cards.filter((c) => inProg(c.s, state.prog)).length : cards.length;
+    const filtered = state.q.trim() || state.group !== "all" || state.year !== "all";
     $("#resultText").innerHTML = searching && searchMode === "any" && shown
       ? `No exact match - showing <b>${shown}</b> close ${shown === 1 ? "match" : "matches"}`
       : filtered
-        ? `Showing <b>${shown}</b> of ${cards.length} ${cards.length === 1 ? one : many}${searching && shown > 1 ? " · best matches first" : ""}`
-        : `<b>${cards.length}</b> ${cards.length === 1 ? one : many}`;
+        ? `Showing <b>${shown}</b> of ${total} ${total === 1 ? one : many}${searching && shown > 1 ? " · best matches first" : ""}`
+        : `<b>${total}</b> ${total === 1 ? one : many}`;
     $("#clearBtn").hidden = !filtered;
     $("#searchClear").hidden = !filtered;
     $("#clearFab").classList.toggle("active", !!filtered);
-    $("#sheetCount").textContent = filtered ? `${shown} of ${cards.length}` : `${cards.length} ${many}`;
-    const active = [state.q.trim(), state.group !== "all", state.year !== "all", state.prog !== "all"].filter(Boolean).length;
+    $("#sheetCount").textContent = filtered ? `${shown} of ${total}` : `${total} ${many}`;
+    const active = [state.q.trim(), state.group !== "all", state.year !== "all"].filter(Boolean).length;
+    // No match (or only close matches) in this tab, but a full match in another - e.g. a working
+    // professional's name searched under "All": offer to switch tabs.
+    const tabHint = $("#tabHint");
+    if (tabHint) {
+      const exactIn = (prog) => cards.filter((c) => (!searching || c.hit.all) && passesFilters(c, "prog") && inProg(c.s, prog)).length;
+      const other = shown && searchMode === "all" ? null
+        : progBtns.find((b) => b.dataset.prog !== state.prog && b.dataset.prog !== "all" && exactIn(b.dataset.prog));
+      tabHint.hidden = !other;
+      if (other) {
+        tabHint.dataset.prog = other.dataset.prog;
+        tabHint.textContent = `${exactIn(other.dataset.prog)} found in ${other.firstChild.textContent}`;
+      }
+    }
+    // Keep the chosen tab in view when the row scrolls sideways (phones).
+    const activeTab = progBtns.find((b) => b.dataset.prog === state.prog);
+    if (activeTab && (activeTab.offsetLeft < progTabs.scrollLeft || activeTab.offsetLeft + activeTab.offsetWidth > progTabs.scrollLeft + progTabs.clientWidth)) {
+      progTabs.scrollLeft = activeTab.offsetLeft - 4;
+    }
     const badge = $("#fabBadge");
     badge.hidden = !active;
     badge.textContent = active;
@@ -660,7 +677,9 @@
   /* ---------- Events ---------- */
   groupSel.addEventListener("change", () => setState({ group: groupSel.value }));
   yearSel.addEventListener("change", () => setState({ year: yearSel.value }));
-  if (progSel) progSel.addEventListener("change", () => setState({ prog: progSel.value }));
+  progBtns.forEach((b) => b.addEventListener("click", () => setState({ prog: b.dataset.prog })));
+  const tabHint = $("#tabHint");
+  if (tabHint) tabHint.addEventListener("click", () => setState({ prog: tabHint.dataset.prog }));
   sortSel.addEventListener("change", () => setState({ sort: sortSel.value }));
 
   let qTimer;
@@ -695,7 +714,7 @@
   }
   document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => switchView(b.dataset.view)));
 
-  const clearAll = () => setState({ q: "", group: "all", year: "all", prog: "all" });
+  const clearAll = () => setState({ q: "", group: "all", year: "all" }); // keeps the programme tab
   $("#clearBtn").addEventListener("click", clearAll);
   document.querySelector("[data-clear]").addEventListener("click", clearAll);
 
