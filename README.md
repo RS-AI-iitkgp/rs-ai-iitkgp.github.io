@@ -9,6 +9,7 @@ A static website listing the department's research scholars (PhD and MS by Resea
 - `index.html` - current research scholars (PhD and MS by Research)
 - `alumni.html` - PhD alumni and where they work now
 - `events.html` - events and activities (Research Scholars' Day, IdoAI talks, celebrations)
+- `update.html` - form where scholars and alumni send corrections, new details and a photo
 
 All pages offer typo-tolerant search, filters, sorting, grid and list views,
 dark mode, and a mobile search button.
@@ -17,15 +18,24 @@ dark mode, and a mobile search button.
 
 ```
 index.html, alumni.html,
-events.html               pages
+events.html, update.html  pages
 assets/css/style.css      styles
 assets/js/directory.js    search, filters, cards
+assets/js/update.js       update form (set ENDPOINT here)
+apps-script/update-form.gs  receiver for the update form (runs in Google Apps Script)
 data/scholars.js          research scholar data
 data/alumni.js            alumni data
 data/events.js            events data
 data/supervisors.js       supervisor websites
 images/                   photos and logo
 ```
+
+## Update form
+
+`update.html` sends each submission to a Google Apps Script web app, which adds
+a row to a Google Sheet and saves the photo in Google Drive. Set-up steps are at
+the top of `apps-script/update-form.gs`; then put the web app URL in `ENDPOINT`
+at the top of `assets/js/update.js`. Until then the form asks people to email.
 
 ## Licence
 
