@@ -493,12 +493,13 @@
   const yearSel = $("#year");
   const sortSel = $("#sort");
   // Programme tabs under the heading. "All" leaves out working professionals, who have their own tab.
+  // The third entry is the shorter label shown on phones.
   const progTabs = $("#progTabs");
-  const PROG_TABS = [["all", "All"], ["PhD", "Regular PhD"], ["MS by Research", "MS by Research"], ["Working Professional", "Working Professional"]];
+  const PROG_TABS = [["all", "All", "All"], ["PhD", "Regular PhD", "PhD"], ["MS by Research", "MS by Research", "MS"], ["Working Professional", "Working Professional", "Working Prof."]];
   const PROGS = progTabs ? PROG_TABS.slice(1).map(([v]) => v) : [];
   const inProg = (s, prog) => (prog === "all" ? s.progKey !== "Working Professional" : s.progKey === prog);
-  if (progTabs) progTabs.innerHTML = PROG_TABS.map(([v, label]) =>
-    `<button type="button" data-prog="${esc(v)}" aria-pressed="false">${esc(label)}<span class="pt-n"></span></button>`).join("");
+  if (progTabs) progTabs.innerHTML = PROG_TABS.map(([v, label, short]) =>
+    `<button type="button" data-prog="${esc(v)}" aria-pressed="false"><span class="pt-l">${esc(label)}</span><span class="pt-s">${esc(short)}</span><span class="pt-n"></span></button>`).join("");
   const progBtns = progTabs ? [...progTabs.querySelectorAll("button")] : [];
 
   groupSel.innerHTML = [`<option value="all">${esc(cfg.group.all)}</option>`, ...GROUPS.map((g) => `<option value="${esc(g)}" data-hue="${HUE.get(g)}">${esc(g)}</option>`)].join("");
