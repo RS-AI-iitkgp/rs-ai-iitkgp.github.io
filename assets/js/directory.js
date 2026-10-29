@@ -856,14 +856,17 @@
     };
     requestAnimationFrame(tick);
   }
-  const stats = cfg.stats({ items: ITEMS, groups: GROUPS.filter((g) => g !== NONE), years: YEARS });
+  // Like the "All" tab, the headline numbers leave out working professionals.
+  const CORE = ITEMS.filter((s) => s.progKey !== "Working Professional");
+  const coreYears = YEARS.filter((y) => CORE.some((s) => s.year === y));
+  const stats = cfg.stats({ items: CORE, groups: GROUPS.filter((g) => g !== NONE && CORE.some((s) => s.group === g)), years: coreYears });
   document.querySelectorAll("[data-count]").forEach((el) => {
     const v = stats[el.dataset.count];
     if (v == null) el.closest("li").hidden = true;
     else countUp(el, v);
   });
   const batchLabel = $("#batchLabel");
-  if (batchLabel && YEARS.length > 1) batchLabel.textContent += ` · ${YEARS[YEARS.length - 1]}-${YEARS[0]}`;
+  if (batchLabel && coreYears.length > 1) batchLabel.textContent += ` · ${coreYears[coreYears.length - 1]}-${coreYears[0]}`;
 
   /* ---------- Link popups ---------- */
   // One floating popup (cards clip overflow) naming the hovered link; for email it shows the
