@@ -76,14 +76,17 @@ svg { display: block; flex-shrink: 0; }
 /* ------------------------------------------------------------------ */
 .site-header {
   position: sticky; top: 0; z-index: 30;
-  height: var(--header-h);
+  /* Extra room above the bar at the top of the page; once scrolled, the bar slides up over it
+     (a transform, so the page below never shifts). */
+  --header-pad: 14px;
+  height: calc(var(--header-h) + var(--header-pad)); padding-top: var(--header-pad);
   background: color-mix(in srgb, var(--bg) 82%, transparent);
   backdrop-filter: saturate(1.4) blur(14px);
   -webkit-backdrop-filter: saturate(1.4) blur(14px);
   border-bottom: 1px solid transparent;
-  transition: border-color .3s ease, box-shadow .3s ease;
+  transition: border-color .3s ease, box-shadow .3s ease, transform .45s var(--ease);
 }
-.site-header.scrolled { border-bottom-color: var(--line); }
+.site-header.scrolled { border-bottom-color: var(--line); transform: translateY(calc(-1 * var(--header-pad))); }
 .header-inner { height: 100%; display: flex; align-items: center; gap: 28px; }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; min-width: 0; margin-right: auto; }
 .brand-logo { width: 44px; height: 44px; flex-shrink: 0; object-fit: contain; }
@@ -233,6 +236,14 @@ kbd {
   border-radius: 5px; color: var(--muted); background: var(--surface);
 }
 .search:focus-within kbd { opacity: 0; }
+/* Clears the search and every filter; takes the "/" hint's place while anything is filtered */
+.search-clear {
+  display: grid; place-items: center; flex: none; width: 28px; height: 28px; margin-right: -3px; padding: 0;
+  border: 0; border-radius: 50%; background: transparent; color: var(--muted);
+  transition: background-color .2s ease, color .2s ease;
+}
+.search-clear:hover { background: var(--accent-soft); color: var(--accent); }
+.search:has(.search-clear:not([hidden])) kbd { display: none; }
 /* Custom dropdowns (the native <select> stays hidden underneath) */
 .select { position: relative; min-width: 0; }
 .select select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; }
@@ -325,18 +336,19 @@ kbd {
 .card:hover::before { transform: scaleX(1); }
 
 .c-photo {
-  grid-area: mono; position: relative; overflow: hidden; display: grid; place-items: center;
+  grid-area: mono; position: relative; overflow: hidden; isolation: isolate; display: grid; place-items: center;
   width: 132px; height: 132px; border-radius: 18px;
   background: color-mix(in srgb, var(--area) 11%, var(--surface)); color: var(--area);
   font: 600 42px/1 var(--display); letter-spacing: .01em;
   transition: background-color .35s ease, color .35s ease;
 }
 .c-photo img {
-  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: inherit;
   opacity: 0; transform: scale(1.04); transition: opacity .5s ease, transform .6s var(--ease);
 }
 .c-photo img.loaded { opacity: 1; transform: none; }
-.card:hover .c-photo { background: var(--area); color: var(--surface); }
+/* Initials only: behind a photo the dark fill would bleed through the rounded corners. */
+.card:hover .c-photo:not(:has(img.loaded)) { background: var(--area); color: var(--surface); }
 .card:hover .c-photo img.loaded { transform: scale(1.05); }
 .c-joined {
   grid-area: joined; justify-self: end; align-self: start;
@@ -562,6 +574,7 @@ kbd {
 .sheet-head { display: none; }
 .search-fab { display: none; }
 .view-fab { display: none; }
+.clear-fab { display: none; }
 @keyframes swap-in { from { opacity: 0; } }
 .grid.swap { animation: swap-in .25s ease-out; } /* filtering, sorting, grid ↔ list: a plain fade */
 .sheet-backdrop {
@@ -601,6 +614,7 @@ html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
   .footer-inner > :first-child { grid-column: 1 / -1; }
 }
 @media (max-width: 720px) {
+  .site-header { --header-pad: 8px; }
   .footer-base { padding-bottom: calc(96px + env(safe-area-inset-bottom)); } /* room for the floating buttons */
   /* Own stacking layer so dropdowns sit above the cards. */
   .toolbar { position: relative; top: auto; z-index: 25; flex-wrap: wrap; }
@@ -642,6 +656,18 @@ html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
   }
   .view-fab.show { opacity: 1; transform: none; pointer-events: auto; }
   .view-fab:active { transform: scale(.92); }
+  /* Clear search and filters, left of the grid/list toggle; only while something is filtered */
+  .clear-fab {
+    position: fixed; right: calc(18px + 56px + 12px + 44px + 10px); bottom: calc(24px + env(safe-area-inset-bottom)); z-index: 50;
+    display: flex; align-items: center; gap: 6px; height: 44px; padding: 0 16px 0 13px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-size: 14px; font-weight: 600;
+    box-shadow: 0 12px 26px -12px rgba(0, 0, 0, .35), 0 3px 8px rgba(0, 0, 0, .08);
+    opacity: 0; transform: translateY(18px) scale(.85); pointer-events: none;
+    transition: opacity .25s ease .08s, transform .35s var(--ease) .08s;
+  }
+  .clear-fab svg { color: var(--accent); }
+  .clear-fab.show.active { opacity: 1; transform: none; pointer-events: auto; }
+  .clear-fab.show.active:active { transform: scale(.92); }
   .view-fab .vf-grid, .view-fab[data-view="list"] .vf-list { display: none; }
   .view-fab[data-view="list"] .vf-grid { display: block; }
   .search-fab:active { transform: scale(.92); }

@@ -591,6 +591,8 @@
         ? `Showing <b>${shown}</b> of ${cards.length} ${cards.length === 1 ? one : many}${searching && shown > 1 ? " · best matches first" : ""}`
         : `<b>${cards.length}</b> ${cards.length === 1 ? one : many}`;
     $("#clearBtn").hidden = !filtered;
+    $("#searchClear").hidden = !filtered;
+    $("#clearFab").classList.toggle("active", !!filtered);
     $("#sheetCount").textContent = filtered ? `${shown} of ${cards.length}` : `${cards.length} ${many}`;
     const active = [state.q.trim(), state.group !== "all", state.year !== "all", state.prog !== "all"].filter(Boolean).length;
     const badge = $("#fabBadge");
@@ -681,7 +683,7 @@
   // Grid ↔ list (toolbar buttons and the phone button), keeping the card you were looking at in place.
   function switchView(view) {
     if (view === state.view) return;
-    const top = $("#siteHeader").offsetHeight;
+    const top = $("#siteHeader").getBoundingClientRect().bottom;
     const anchor = [...grid.children].find((el) => !el.hidden && el.getBoundingClientRect().bottom > top + 8); // first card on screen
     const before = anchor ? anchor.getBoundingClientRect().top : 0;
     rememberView(view);
@@ -724,10 +726,11 @@
   let sheetSnapshot = "";
 
   function updateFab() {
-    const headerH = $("#siteHeader").offsetHeight;
+    const headerH = $("#siteHeader").getBoundingClientRect().bottom; // its visible edge: the bar slides up once scrolled
     const past = !sheetOpen && phone.matches && toolbar.getBoundingClientRect().bottom < headerH;
     fab.classList.toggle("show", past);
     viewFab.classList.toggle("show", past);
+    $("#clearFab").classList.toggle("show", past);
   }
 
   function openSheet() {
@@ -769,6 +772,17 @@
   }
 
   fab.addEventListener("click", openSheet);
+
+  // The × in the search box and the floating "Clear" on phones: clear everything and,
+  // if you were down in the results, go back to the top of the list.
+  function clearFromBar() {
+    const deep = $("#directory").getBoundingClientRect().top < 0;
+    clearAll();
+    if (deep && !sheetOpen) $("#directory").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+    if (sheetOpen || !phone.matches) qInput.focus({ preventScroll: true }); // no surprise keyboard on phones
+  }
+  $("#searchClear").addEventListener("click", clearFromBar);
+  $("#clearFab").addEventListener("click", clearFromBar);
 
   viewFab.addEventListener("click", () => switchView(state.view === "grid" ? "list" : "grid"));
   $("#sheetDone").addEventListener("click", () => closeSheet());

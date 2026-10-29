@@ -116,7 +116,7 @@
     function update() {
       const y = scrollY;
       if (Math.abs(y - lastY) > 6) { goingUp = y < lastY; lastY = y; }
-      const past = h1.getBoundingClientRect().bottom < header.offsetHeight;
+      const past = h1.getBoundingClientRect().bottom < header.getBoundingClientRect().bottom;
       // On narrow screens scrolling up brings the nav back.
       const show = past && !(goingUp && header.classList.contains("hdr-compact"));
       header.classList.toggle("show-event", show);
