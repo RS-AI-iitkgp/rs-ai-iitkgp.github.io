@@ -246,8 +246,8 @@
     if (cfg.kind === "event") return eventCardHTML(s);
     const alumni = cfg.kind === "alumni";
     const sups = s.supervisors;
-    // Alumni: the thesis title; until it is known, their research interest (if given).
-    const noThesis = alumni && (!s.thesis || PLACEHOLDER.test(String(s.thesis).trim())) && s.topic;
+    // Alumni: their research interest; the thesis title only when no research interest is given.
+    const noThesis = alumni && !!s.topic;
     const text = alumni && !noThesis ? s.thesis : s.topic;
     const label = alumni ? (noThesis ? "Research" : "Thesis") : "";
     const links = [

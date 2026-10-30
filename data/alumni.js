@@ -20,8 +20,8 @@
    status        Optional, e.g. "Thesis submitted" - shown in place of
                  the "Graduated" badge until the degree is awarded.
    thesis        PhD thesis title
-   topic         Optional research interest - shown (as "Research")
-                 while the thesis title is still the placeholder.
+   topic         Research interest - shown on the card (as "Research").
+                 The thesis title is shown only when this is left empty.
    supervisors   One or more supervisors, e.g. ["Prof. A", "Prof. B"]
    photo         Path to a square photo, e.g. "images/alumni/jane-doe.jpg".
                  If the file is missing, the card shows initials instead.
