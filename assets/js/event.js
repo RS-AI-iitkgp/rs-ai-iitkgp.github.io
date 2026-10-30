@@ -190,7 +190,7 @@
     /* Zoom & pan - so faces in big group photos can be seen at full resolution */
     let z = 1, tx = 0, ty = 0;
     const nativeZoom = () => (fullWidth && img.offsetWidth ? fullWidth / img.offsetWidth : 2);
-    const maxZoom = () => Math.max(2, nativeZoom() * 1.5);
+    const maxZoom = () => Math.max(1.5, nativeZoom()); // stop at full detail instead of blowing up pixels
     function baseCenter() { // image centre without the zoom transform
       const r = stage.getBoundingClientRect();
       return { x: r.left + img.offsetLeft + img.offsetWidth / 2, y: r.top + img.offsetTop + img.offsetHeight / 2 };

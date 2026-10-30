@@ -228,6 +228,20 @@ h1 span { color: var(--accent); }
   font-size: 12px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums;
 }
 .prog-tabs button[aria-pressed="true"] .pt-n { background: var(--surface); color: var(--accent); }
+.pt-s { display: none; }
+/* Phones: short labels (PhD, MS, Working) and tighter tabs so all four fit on one line */
+@media (max-width: 600px) {
+  .pt-l { display: none; }
+  .pt-s { display: inline; }
+  .prog-tabs { gap: 2px; }
+  .prog-tabs button { flex: 1 0 auto; justify-content: center; gap: 5px; height: 34px; padding: 0 8px; font-size: 13px; }
+  .pt-n { min-width: 18px; padding: 1px 5px; font-size: 11px; }
+}
+@media (max-width: 359px) {
+  .prog-tabs { padding: 3px; }
+  .prog-tabs button { gap: 4px; padding: 0 5px; font-size: 12px; }
+  .pt-n { min-width: 16px; padding: 1px 4px; }
+}
 /* A soft shadow on the side that has more tabs to scroll to */
 @media (max-width: 720px) {
   .prog-tabs {

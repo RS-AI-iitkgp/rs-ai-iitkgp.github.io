@@ -44,7 +44,7 @@ neha-kumari.jpg
 p-b-salim.jpg
 panchagnula-vasundhara-vinuthna.jpg
 piyali-karmakar.jpg
-priyanka.jpg
+priyanka-goyal.jpg
 raj-krishan-ghosh.jpg
 ranjan-sarkar.jpg
 rekha-regar.jpg
